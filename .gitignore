@@ -1,0 +1,5 @@
+.idea/
+JapaneseTokenizer.egg-info/
+build/
+dist/
+morphogySplitters/
