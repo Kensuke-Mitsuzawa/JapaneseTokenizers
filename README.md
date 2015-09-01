@@ -21,6 +21,11 @@ pip install -r requirement.txt
 
 This command automatically install all libraries that this package depends on.
 
+## install
+
+```
+[sudo] python setup.py install
+```
 
 
 # example usage

@@ -17,6 +17,11 @@
 pip install -r requirement.txt
 ```
 
+## install
+
+```
+[sudo] python setup.py install
+```
 
 
 
