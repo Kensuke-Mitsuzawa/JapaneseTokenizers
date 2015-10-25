@@ -3,3 +3,4 @@ JapaneseTokenizer.egg-info/
 build/
 dist/
 morphogySplitters/
+.DS_Store
