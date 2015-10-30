@@ -1,27 +1,20 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
 __author__ = 'kensuke-mi'
 
 import unicodedata
 import re
 import sys
 
-try:
-    unicode # python2
-    def u(str): return str.decode("utf-8")
-    def b(str): return str
-    pass
-except: # python3
-    def u(str): return str
-    def b(str): return str.encode("utf-8")
-    pass
-
-
-kanji = u(r'[一-龠]+')
-hiragana = u(r'[ぁ-ん]+')
-zenkaku_katakana = u(r'[ァ-ヴ]+')
-hankaku_symbol_prefix = u(r'[^A-Za-z]')
-hankaku_symbol_seq = u(r'[A-Za-z]')
+kanji = r'[一-龠]+'
+hiragana = r'[ぁ-ん]+'
+zenkaku_katakana = r'[ァ-ヴ]+'
+hankaku_symbol_prefix = r'[^A-Za-z]'
+hankaku_symbol_seq = r'[A-Za-z]'
 
 
 def normalize_text(text):
@@ -40,32 +33,32 @@ def normalize_text(text):
     except TypeError:
         sys.exit("argument should be coded in UTF-8")
 
-    text = re.sub(u(r'˗|֊|‐|‑|‒|–|⁃|⁻|₋|−'), '-', text)
-    text = re.sub(u(r'﹣|－|ｰ|—|―|─|━'), 'ー', text)
-    text = re.sub(u(r'~|∼|∾|〜|〰|～'), '', text)
+    text = re.sub(r'˗|֊|‐|‑|‒|–|⁃|⁻|₋|−', '-', text)
+    text = re.sub(r'﹣|－|ｰ|—|―|─|━', 'ー', text)
+    text = re.sub(r'~|∼|∾|〜|〰|～', '', text)
 
-    text = re.sub(u(r' +'), u(' '), text)
-    text = re.sub(u(r'^\s+(.+)$'), u(r'\1'), text)
-    text = re.sub(u(r'(.+)\s+$'), u(r'\1'), text)
+    text = re.sub(r' +', ' ', text)
+    text = re.sub(r'^\s+(.+)$', r'\1', text)
+    text = re.sub(r'(.+)\s+$', r'\1', text)
 
 
     # 半角カタカナはすでに全角カタカナに正規化されている
     # 全角英数はすでに半角英数に正規化されている前提
     pattern = u'{}|{}|{}|{}'.format(hiragana, zenkaku_katakana, hankaku_symbol_prefix, kanji)
 
-    while re.findall(u(r'({})\s+({})').format(pattern, pattern), text) != []:
-        text = re.sub(u(r'({})\s+({})').format(pattern, pattern), r'\1\2', text)
+    while re.findall(r'({})\s+({})'.format(pattern, pattern), text) != []:
+        text = re.sub(r'({})\s+({})'.format(pattern, pattern), r'\1\2', text)
 
-    pattern = u('{}|{}|{}').format(hiragana, zenkaku_katakana, kanji)
-    while re.findall(u(r'({})\s+({})').format(pattern, hankaku_symbol_seq), text) != []:
-        text = re.sub(u(r'({})\s+({})').format(pattern, hankaku_symbol_seq), u(r'\1\2'), text)
+    pattern = '{}|{}|{}'.format(hiragana, zenkaku_katakana, kanji)
+    while re.findall(r'({})\s+({})'.format(pattern, hankaku_symbol_seq), text) != []:
+        text = re.sub(r'({})\s+({})'.format(pattern, hankaku_symbol_seq), r'\1\2', text)
 
 
     return text
 
 
 def test():
-    text = u('あるBさんとCさんがーで〜で-ーだった。   やばい   。＆＊（）＆％。　　プログラミング　Cは難しい。でもLanguage C＋＋はそんなに難しくない。')
+    text = 'あるBさんとCさんがーで〜で-ーだった。   やばい   。＆＊（）＆％。　　プログラミング　Cは難しい。でもLanguage C＋＋はそんなに難しくない。'
     res = normalize_text(text)
     print(res)
     print([res])
