@@ -4,6 +4,7 @@ __author__ = 'kensuke-mi'
 import sys
 import unittest
 from JapaneseTokenizer.mecab_wrapper import mecab_wrapper
+import os
 python_version = sys.version_info
 
 try:
@@ -19,7 +20,7 @@ except: # python3
 class TestMecabWrapper(unittest.TestCase):
     def setUp(self):
         self.test_senetence = u('紗倉 まな（さくらまな、1993年3月23日 - ）は、日本のAV女優。')
-        self.path_user_dict = '../resources/test/userdict.csv'
+        self.path_user_dict = os.path.join(os.path.dirname(__file__), 'resources/test/userdict.csv')
 
 
     def test_init_mecab_wrapper(self):
@@ -57,7 +58,6 @@ class TestMecabWrapper(unittest.TestCase):
 
             res = mecab_obj.tokenize(sentence=self.test_senetence)
             assert isinstance(res, list)
-            print(res)
             assert u('さくらまな') in res
 
 

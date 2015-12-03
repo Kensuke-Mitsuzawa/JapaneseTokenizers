@@ -7,14 +7,12 @@ abs_path = os.path.abspath(sys.argv[0])
 abs_path_dir = os.path.dirname(abs_path)
 sys.path.append(abs_path_dir)
 os.chdir(abs_path_dir)
+from JapaneseTokenizer import MecabWrapper
 
-sys.path.append('../JapaneseTokenizer/')
-from mecab_wrapper.mecab_wrapper import MecabWrapper
 
 def __example():
-
     example_user_dict = "../resources/test/userdict.csv"
-    osType="mac"
+    osType="generic"
 
     mecab_wrapper = MecabWrapper(dictType='all', osType=osType, pathUserDictCsv=example_user_dict)
 

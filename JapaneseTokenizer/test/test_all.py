@@ -7,5 +7,4 @@ def suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(TestMecabWrapper))
 
-
     return suite

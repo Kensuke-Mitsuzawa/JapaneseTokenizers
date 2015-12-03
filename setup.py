@@ -2,9 +2,10 @@
 from setuptools import setup, find_packages
 import JapaneseTokenizer.mecab_wrapper.mecab_wrapper as mecab_wrapper
 import sys
-python_version = sys.version_info
+from JapaneseTokenizer import __version__
 
-install_requires = []
+python_version = sys.version_info
+install_requires = ['mecab-python']
 
 try:
     import MeCab
@@ -29,8 +30,8 @@ except Exception as e:
 setup(
     author='Kensuke Mitsuzawa',
     name = 'JapaneseTokenizer',
-    version=mecab_wrapper.__version__,
-    test_suite='test_all.suite',
+    version=__version__,
+    test_suite='JapaneseTokenizer.test.test_all.suite',
     install_requires = install_requires,
     packages=find_packages(),
     )
