@@ -3,8 +3,11 @@ from setuptools import setup, find_packages
 import JapaneseTokenizer.mecab_wrapper.mecab_wrapper as mecab_wrapper
 import sys
 from JapaneseTokenizer import __version__
+import install_python_dependencies
 
 python_version = sys.version_info
+
+
 install_requires = ['mecab-python']
 
 try:
