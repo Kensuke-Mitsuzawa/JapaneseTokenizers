@@ -1,12 +1,13 @@
 #! -*- coding: utf-8 -*-
-__author__ = 'kensuke-mi'
-
 import sys
 import os
 import logging
 import subprocess
-from JapaneseTokenizer.mecab_wrapper.text_preprocess import normalize_text
 import MeCab
+from JapaneseTokenizer.mecab_wrapper.text_preprocess import normalize_text
+from ..common.filter import filter_words
+from ..datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
+__author__ = 'kensuke-mi'
 
 try:
     unicode # python2
@@ -175,7 +176,7 @@ class MecabWrapper:
         return tuple_pos, word_stem
 
 
-    def tokenize(self, sentence, is_feature=False, is_surface=False):
+    def tokenize(self, sentence, is_feature=False, is_surface=False, return_list=True):
         """
         :param sentence:
         :param ins_mecab:
@@ -188,6 +189,7 @@ class MecabWrapper:
         else:
             assert isinstance(sentence, unicode)
 
+        tokenized_objects = []
         list_sentence_processed = []  # list to save word stem of posted contents
         normalized_sentence = normalize_text(sentence)
 
@@ -200,6 +202,8 @@ class MecabWrapper:
         node = self.mecabObj.parseToNode(encoded_text)
         node = node.next
         while node.next is not None:
+
+
             if python_version >= (3, 0, 0):
                 word_surface = node.surface
             else:
@@ -209,17 +213,74 @@ class MecabWrapper:
                 tuple_pos, word_stem = self.__feature_parser(node.feature, word_surface)
             else:
                 tuple_pos, word_stem = self.__feature_parser(node.feature.decode('utf-8'), word_surface)
-            if is_feature == True:
-                if is_surface == True:
-                    list_sentence_processed.append( (word_surface, tuple_pos) )
-                else:
-                    list_sentence_processed.append( (word_stem, tuple_pos) )
-            else:
-                if is_surface == True:
-                    list_sentence_processed.append( word_surface )
-                else:
-                    list_sentence_processed.append( word_stem )
 
+            tokenized_obj = TokenizedResult(
+                node_obj=node,
+                tuple_pos=tuple_pos,
+                word_stem=word_stem,
+                word_surface=word_surface,
+                is_feature=is_feature,
+                is_surface=is_surface
+            )
+            tokenized_objects.append(tokenized_obj)
             node = node.next
 
-        return list_sentence_processed
+        tokenized_sentence = TokenizedSenetence(
+            sentence=sentence,
+            tokenized_objects=tokenized_objects
+        )
+
+        if return_list:
+            return tokenized_sentence.convert_list_object()
+        else:
+            return tokenized_sentence
+
+    def __check_stopwords_str_typle(self, stopwords):
+        assert isinstance(stopwords, list)
+        return [
+            u(s_word)
+            for s_word
+            in stopwords
+        ]
+
+    def convert_str(self, p_c_tuple):
+        converted = []
+        for item in p_c_tuple:
+            if isinstance(item, str): converted.append(u(item))
+            else: converted.append(item)
+        return converted
+
+    def __check_pos_condition_str(self, pos_condistion):
+        assert isinstance(pos_condistion, list)
+        # [ ('', '', '') ]
+
+        return [
+            tuple(self.convert_str(p_c_tuple))
+            for p_c_tuple
+            in pos_condistion
+        ]
+
+    def filter(self, parsed_sentence, pos_condistion, stopwords=None):
+        assert isinstance(parsed_sentence, TokenizedSenetence)
+        assert isinstance(pos_condistion, list)
+        assert isinstance(stopwords, (type(None), list))
+
+        if isinstance(stopwords, type(None)):
+            s_words = []
+        else:
+            s_words = self.__check_stopwords_str_typle(stopwords)
+
+        if isinstance(pos_condistion, type(None)):
+            p_condition = []
+        else:
+            p_condition = self.__check_pos_condition_str(pos_condistion)
+
+        filtered_object = filter_words(
+            tokenized_obj=parsed_sentence,
+            valid_pos=p_condition,
+            stopwords=s_words
+        )
+        assert isinstance(filtered_object, FilteredObject)
+
+        return filtered_object
+
