@@ -2,5 +2,7 @@
 JapaneseTokenizer.egg-info/
 build/
 dist/
+*pyc
 morphogySplitters/
+
 .DS_Store
