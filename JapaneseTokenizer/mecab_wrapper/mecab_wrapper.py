@@ -237,8 +237,10 @@ class MecabWrapper:
 
     def __check_stopwords_str_typle(self, stopwords):
         assert isinstance(stopwords, list)
+        convert_to_unicode = lambda input: u(input) if isinstance(s_word, str) else input
+
         return [
-            u(s_word)
+            convert_to_unicode(s_word)
             for s_word
             in stopwords
         ]
@@ -260,9 +262,9 @@ class MecabWrapper:
             in pos_condistion
         ]
 
-    def filter(self, parsed_sentence, pos_condistion, stopwords=None):
+    def filter(self, parsed_sentence, pos_condition=None, stopwords=None):
         assert isinstance(parsed_sentence, TokenizedSenetence)
-        assert isinstance(pos_condistion, list)
+        assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
         if isinstance(stopwords, type(None)):
@@ -270,10 +272,10 @@ class MecabWrapper:
         else:
             s_words = self.__check_stopwords_str_typle(stopwords)
 
-        if isinstance(pos_condistion, type(None)):
+        if isinstance(pos_condition, type(None)):
             p_condition = []
         else:
-            p_condition = self.__check_pos_condition_str(pos_condistion)
+            p_condition = self.__check_pos_condition_str(pos_condition)
 
         filtered_object = filter_words(
             tokenized_obj=parsed_sentence,
