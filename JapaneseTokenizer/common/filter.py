@@ -1,4 +1,5 @@
 #! -*- coding: utf-8 -*-
+import typing
 from ..datamodels import TokenizedSenetence, TokenizedResult, FilteredObject
 __author__ = 'kensuke-mi'
 
