@@ -1,78 +1,75 @@
-#! /usr/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
+import jctconv
+import re
+import unicodedata
 __author__ = 'kensuke-mi'
 
-import unicodedata
-import re
-import sys
 
-kanji = r'[一-龠]+'
-hiragana = r'[ぁ-ん]+'
-zenkaku_katakana = r'[ァ-ヴ]+'
-hankaku_symbol_prefix = r'[^A-Za-z]'
-hankaku_symbol_seq = r'[A-Za-z]'
-
-
-def normalize_text(text):
-    """
-    :param text:
-    :return:
-    """
-    python_version = sys.version_info
-    if python_version >= (3, 0, 0):
-        assert isinstance(text, str)
+def normalize_text(input_text, dictionary_mode):
+    if dictionary_mode=='neologd':
+        # this code comes from https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja
+        return normalize_neologd(input_text)
     else:
-        assert isinstance(text, unicode)
-
-    try:
-        text = unicodedata.normalize('NFKC', text)
-    except TypeError:
-        sys.exit("argument should be coded in UTF-8")
-
-    text = re.sub(r'˗|֊|‐|‑|‒|–|⁃|⁻|₋|−', '-', text)
-    text = re.sub(r'﹣|－|ｰ|—|―|─|━', 'ー', text)
-    text = re.sub(r'~|∼|∾|〜|〰|～', '', text)
-
-    text = re.sub(r' +', ' ', text)
-    text = re.sub(r'^\s+(.+)$', r'\1', text)
-    text = re.sub(r'(.+)\s+$', r'\1', text)
+        return normalize_text_normal_ipadic(input_text)
 
 
-    # 半角カタカナはすでに全角カタカナに正規化されている
-    # 全角英数はすでに半角英数に正規化されている前提
-    pattern = u'{}|{}|{}|{}'.format(hiragana, zenkaku_katakana, hankaku_symbol_prefix, kanji)
-
-    while re.findall(r'({})\s+({})'.format(pattern, pattern), text) != []:
-        text = re.sub(r'({})\s+({})'.format(pattern, pattern), r'\1\2', text)
-
-    pattern = '{}|{}|{}'.format(hiragana, zenkaku_katakana, kanji)
-    while re.findall(r'({})\s+({})'.format(pattern, hankaku_symbol_seq), text) != []:
-        text = re.sub(r'({})\s+({})'.format(pattern, hankaku_symbol_seq), r'\1\2', text)
+def normalize_text_normal_ipadic(input_text):
+    """
+    * All hankaku Katanaka is converted into Zenkaku Katakana
+    * All hankaku English alphabet and numberc string are converted into Zenkaku one
+    """
+    return jctconv.h2z(input_text, kana=True, ascii=True, digit=True)
 
 
-    return text
+def unicode_normalize(cls, s):
+    pt = re.compile('([{}]+)'.format(cls))
 
+    def norm(c):
+        return unicodedata.normalize('NFKC', c) if pt.match(c) else c
 
-def test():
-    text = 'あるBさんとCさんがーで〜で-ーだった。   やばい   。＆＊（）＆％。　　プログラミング　Cは難しい。でもLanguage C＋＋はそんなに難しくない。'
-    res = normalize_text(text)
-    print(res)
-    print([res])
+    s = ''.join(norm(x) for x in re.split(pt, s))
+    return s
 
+def remove_extra_spaces(s):
+    s = re.sub('[ 　]+', ' ', s)
+    blocks = ''.join(('\u4E00-\u9FFF',  # CJK UNIFIED IDEOGRAPHS
+                      '\u3040-\u309F',  # HIRAGANA
+                      '\u30A0-\u30FF',  # KATAKANA
+                      '\u3000-\u303F',  # CJK SYMBOLS AND PUNCTUATION
+                      '\uFF00-\uFFEF'   # HALFWIDTH AND FULLWIDTH FORMS
+                      ))
+    basic_latin = '\u0000-\u007F'
 
+    def remove_space_between(cls1, cls2, s):
+        p = re.compile('([{}]) ([{}])'.format(cls1, cls2))
+        while p.search(s):
+            s = p.sub(r'\1\2', s)
+        return s
 
-if __name__ == '__main__':
-    import sys
-    import codecs
-    test()
-    sys.exit()
+    s = remove_space_between(blocks, blocks, s)
+    s = remove_space_between(blocks, basic_latin, s)
+    s = remove_space_between(basic_latin, blocks, s)
+    return s
 
-    path_to_text = sys.argv[1]
-    #path_to_text = '../fuman_pipeline/resources/input/fuman_hotel.tsv'
-    with codecs.open(path_to_text, 'r', 'utf-8') as f_obj:
-        for line in f_obj.readlines():
-            print(normalize_text(line).encode('utf-8'))
+def normalize_neologd(s):
+    s = s.strip()
+    s = unicode_normalize('０-９Ａ-Ｚａ-ｚ｡-ﾟ', s)
+
+    def maketrans(f, t):
+        return {ord(x): ord(y) for x, y in zip(f, t)}
+
+    s = s.translate(
+        maketrans('!"#$%&\'()*+,-./:;<=>?@[¥]^_`{|}~｡､･｢｣',
+              '！”＃＄％＆’（）＊＋，−．／：；＜＝＞？＠［￥］＾＿｀｛｜｝〜。、・「」'))
+    s = re.sub('[˗֊‐‑‒–⁃⁻₋−]+', '-', s)  # normalize hyphens
+    s = re.sub('[﹣－ｰ—―─━ー]+', 'ー', s)  # normalize choonpus
+    s = re.sub('[~∼∾〜〰～]', '', s)  # remove tildes
+    s = remove_extra_spaces(s)
+    s = unicode_normalize('！”＃＄％＆’（）＊＋，−．／：；＜＞？＠［￥］＾＿｀｛｜｝〜', s)  # keep ＝,・,「,」
+    s = re.sub('[’]', '\'', s)
+    s = re.sub('[”]', '"', s)
+    return s

@@ -1,8 +1,14 @@
 #! -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
+import sys
 import install_python_dependencies
+python_version = sys.version_info
 
-install_requires = ['mecab-python']
+
+if python_version >= (3, 0, 0):
+    install_requires = ['mecab-python3', 'jctconv']
+else:
+    install_requires = ['mecab-python', 'jctconv']
 
 setup(
     author='Kensuke Mitsuzawa',

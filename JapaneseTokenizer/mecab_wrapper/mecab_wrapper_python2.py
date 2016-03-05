@@ -4,7 +4,6 @@ import os
 import logging
 import subprocess
 import MeCab
-import typing
 from JapaneseTokenizer.mecab_wrapper.text_preprocess import normalize_text
 from ..common.filter import filter_words
 from ..datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
@@ -39,12 +38,8 @@ class MecabWrapper:
             mecab_dic_cmd = "echo `/usr/local/bin/mecab-config --dicdir`"
         else:
             mecab_dic_cmd = 'echo `mecab-config --dicdir`'
-
         try:
-            if python_version >= (3, 0, 0):
-                path_mecab_dict = subprocess.check_output( mecab_dic_cmd, shell=True  ).decode('utf-8').strip(u('\n'))
-            else:
-                path_mecab_dict = subprocess.check_output( mecab_dic_cmd, shell=True  ).strip(u('\n'))
+            path_mecab_dict = subprocess.check_output( mecab_dic_cmd, shell=True  ).strip('\n')
         except subprocess.CalledProcessError:
             logging.error("{}".format(mecab_dic_cmd))
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to execute mecab-config command")
@@ -60,10 +55,7 @@ class MecabWrapper:
             mecab_libexe_cmd = 'echo `mecab-config --libexecdir`'
 
         try:
-            if python_version >= (3, 0, 0):
-                path_mecab_libexe = subprocess.check_output( mecab_libexe_cmd, shell=True  ).decode('utf-8').strip(u('\n'))
-            else:
-                path_mecab_libexe = subprocess.check_output( mecab_libexe_cmd, shell=True  ).strip(u('\n'))
+            path_mecab_libexe = subprocess.check_output( mecab_libexe_cmd, shell=True  ).strip('\n')
         except subprocess.CalledProcessError:
             logging.error("{}".format(mecab_libexe_cmd))
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to execute mecab-config --libexecdir")
@@ -88,9 +80,6 @@ class MecabWrapper:
             cmMecabInitialize = '-d {}'.format(os.path.join(self._mecab_dictionary_path, "ipadic"))
 
         elif self._dictType == 'user':
-            if python_version >= (3, 0, 0):
-                sys.exit('User dictionary is not supported in Python3')
-
             logging.debug('Use User dictionary')
             pathUserDict = self.__CompileUserdict()
             cmMecabInitialize = '-u {}'.format(pathUserDict)
@@ -120,16 +109,10 @@ class MecabWrapper:
         path_mecab_dict = self.__check_mecab_dict_path()
         path_mecab_libexe = self.__check_mecab_libexe()
 
-        if python_version >= (3, 0, 0):
-            cmCompileDict = '{0}/mecab-dict-index -d {1}/ipadic -u {2} -f utf-8 -t utf-8 {3} > /dev/null'.format(path_mecab_libexe,
-                                                                                                                path_mecab_dict,
-                                                                                                                self._pathUserDictCsv.replace("csv", "dict"),
-                                                                                                                self._pathUserDictCsv)
-        else:
-            cmCompileDict = u'{0}/mecab-dict-index -d {1}/ipadic -u {2} -f utf-8 -t utf-8 {3} > /dev/null'.format(path_mecab_libexe,
-                                                                                                                path_mecab_dict,
-                                                                                                                self._pathUserDictCsv.replace("csv", "dict"),
-                                                                                                                self._pathUserDictCsv)
+        cmCompileDict = u'{0}/mecab-dict-index -d {1}/ipadic -u {2} -f utf-8 -t utf-8 {3} > /dev/null'.format(path_mecab_libexe,
+                                                                                                            path_mecab_dict,
+                                                                                                            self._pathUserDictCsv.replace("csv", "dict"),
+                                                                                                            self._pathUserDictCsv)
         logging.debug(msg="compiling mecab user dictionary with: {}".format(cmCompileDict))
         try:
             subprocess.call( cmCompileDict , shell=True )
@@ -148,9 +131,9 @@ class MecabWrapper:
         :param uni_feature unicode:
         :return ( (pos1, pos2, pos3), word_stem ):
         """
-        list_feature_items = uni_feature.split(u(','))
+        list_feature_items = uni_feature.split((','))
         # if word has no feature at all
-        if len(list_feature_items)==1: return u('*'), u('*')
+        if len(list_feature_items)==1: return ('*'), ('*')
 
         pos1 = list_feature_items[0]
         pos2 = list_feature_items[1]
@@ -175,35 +158,24 @@ class MecabWrapper:
         :param list_pos_candidate:
         :return:  list [tuple (unicode, unicode)]
         """
-        if python_version >= (3, 0, 0):
-            assert isinstance(sentence, str)
-        else:
-            assert isinstance(sentence, unicode)
+
+        assert isinstance(sentence, unicode)
 
         tokenized_objects = []
         list_sentence_processed = []  # list to save word stem of posted contents
         normalized_sentence = normalize_text(sentence)
 
         # don't delete this variable. encoded_text protects sentence from deleting
-        if python_version >= (3, 0, 0):
-            encoded_text = normalized_sentence
-        else:
-            encoded_text = normalized_sentence.encode('utf-8')
+
+        encoded_text = normalized_sentence.encode('utf-8')
 
         node = self.mecabObj.parseToNode(encoded_text)
         node = node.next
         while node.next is not None:
 
+            word_surface = node.surface.decode('utf-8')
 
-            if python_version >= (3, 0, 0):
-                word_surface = node.surface
-            else:
-                word_surface = node.surface.decode('utf-8')
-
-            if python_version >= (3,0,0):
-                tuple_pos, word_stem = self.__feature_parser(node.feature, word_surface)
-            else:
-                tuple_pos, word_stem = self.__feature_parser(node.feature.decode('utf-8'), word_surface)
+            tuple_pos, word_stem = self.__feature_parser(node.feature.decode('utf-8'), word_surface)
 
             tokenized_obj = TokenizedResult(
                 node_obj=node,
@@ -228,7 +200,7 @@ class MecabWrapper:
 
     def __check_stopwords_str_typle(self, stopwords):
         assert isinstance(stopwords, list)
-        convert_to_unicode = lambda input: u(input) if isinstance(s_word, str) else input
+        convert_to_unicode = lambda input: input if isinstance(s_word, str) else input
 
         return [
             convert_to_unicode(s_word)
