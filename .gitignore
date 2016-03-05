@@ -4,5 +4,4 @@ build/
 dist/
 *pyc
 morphogySplitters/
-
 .DS_Store
