@@ -82,6 +82,8 @@ else:
             self.tokenized_objects = tokenized_objects
 
         def __extend_token_object(self, token_object):
+            """This method creates dict object from token object.
+            """
             assert isinstance(token_object, TokenizedResult)
 
             if token_object.is_feature == True:
@@ -108,17 +110,19 @@ else:
 
 
     class TokenizedResult(object):
-        def __init__(self, node_obj, tuple_pos, word_stem, word_surface, is_feature=True, is_surface=False):
-            assert isinstance(node_obj, Node)
+        def __init__(self, node_obj, tuple_pos, word_stem, word_surface, is_feature=True, is_surface=False, misc_info=None):
+            assert isinstance(node_obj, (Node, type(None)))
             assert isinstance(tuple_pos, (str, unicode, tuple))
             assert isinstance(word_stem, (str, unicode))
             assert isinstance(word_surface, (str, unicode))
+            assert isinstance(misc_info, (type(None), dict))
 
             self.node_obj = node_obj
             self.word_stem = word_stem
             self.word_surface = word_surface
             self.is_surface = is_surface
             self.is_feature = is_feature
+            self.misc_info = misc_info
 
             if isinstance(tuple_pos, tuple):
                 self.tuple_pos = tuple_pos

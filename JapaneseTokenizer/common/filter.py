@@ -52,8 +52,15 @@ def filter_words(tokenized_obj, valid_pos, stopwords):
         res_stopwords = __is_sotpwords(token_obj.word_stem, stopwords)
         res_pos_condition = __is_valid_pos(token_obj.tuple_pos, valid_pos)
 
-        if not res_stopwords and res_pos_condition:
-            filtered_tokens.append(token_obj)
+        # case1: only pos filtering is ON
+        if valid_pos != [] and stopwords == []:
+            if res_pos_condition: filtered_tokens.append(token_obj)
+        # case2: obly stopwords filtering is ON
+        if valid_pos == [] and stopwords != []:
+            if res_stopwords is False: filtered_tokens.append(token_obj)
+        # case3: both condition is ON
+        if valid_pos != [] and stopwords != []:
+            if res_stopwords is False and res_pos_condition: filtered_tokens.append(token_obj)
 
     filtered_object = FilteredObject(
         sentence=tokenized_obj.sentence,

@@ -1,3 +1,4 @@
 https://mecab.googlecode.com/files/mecab-python-0.996.tar.gz
 mecab-python3
 http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/knp/pyknp-0.1.zip&name=pyknp-0.1.zip
+pypandoc

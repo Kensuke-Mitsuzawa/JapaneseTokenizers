@@ -1,0 +1,123 @@
+# -*- coding: utf-8 -*-
+from JapaneseTokenizer.juman_wrapper import text_preprocess
+from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
+from JapaneseTokenizer.common import filter
+import pyknp
+import logging
+import sys
+__author__ = 'kensuke-mi'
+
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(asctime)s %(levelname)s %(message)s")
+python_version = sys.version_info
+
+
+class JumanWrapper:
+    def __init__(self):
+        self.juman = pyknp.Juman()
+
+    def __extract_morphological_information(self, mrph_object, is_feature, is_surface):
+        """This method extracts morphlogical information from token object.
+        """
+        assert isinstance(mrph_object, pyknp.Morpheme)
+        assert isinstance(is_feature, bool)
+        assert isinstance(is_surface, bool)
+
+        surface = mrph_object.midasi
+        word_stem = mrph_object.genkei
+
+        tuple_pos = (mrph_object.hinsi, mrph_object.bunrui)
+
+        misc_info = {
+            'katuyou1': mrph_object.katuyou1,
+            'katuyou2': mrph_object.katuyou2,
+            'imis': mrph_object.imis,
+            'repname': mrph_object.repname
+        }
+
+        token_object = TokenizedResult(
+            node_obj=None,
+            tuple_pos=tuple_pos,
+            word_stem=word_stem,
+            word_surface=surface,
+            is_feature=is_feature,
+            is_surface=is_surface,
+            misc_info=misc_info
+        )
+
+        return token_object
+
+    def tokenize(self, sentence, is_feature=False, is_surface=False, return_list=True):
+        """
+        :param sentence:
+        :param ins_mecab:
+        :param list_stopword:
+        :param list_pos_candidate:
+        :return:  list [tuple (unicode, unicode)]
+        """
+        assert isinstance(sentence, unicode)
+
+        normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
+
+        result = self.juman.analysis(normalized_sentence)
+        token_objects = [
+            self.__extract_morphological_information(
+                mrph_object=morph_object,
+                is_surface=is_surface,
+                is_feature=is_feature
+            )
+            for morph_object in result]
+
+        if return_list:
+            tokenized_objects = TokenizedSenetence(
+                sentence=sentence,
+                tokenized_objects=token_objects
+            )
+            return tokenized_objects.convert_list_object()
+        else:
+            tokenized_objects = TokenizedSenetence(
+                sentence=sentence,
+                tokenized_objects=token_objects)
+
+            return tokenized_objects
+
+    def convert_str(self, p_c_tuple):
+        converted = []
+        for item in p_c_tuple:
+            if isinstance(item, str): converted.append(item)
+            else: converted.append(item)
+        return converted
+
+    def __check_pos_condition_str(self, pos_condistion):
+        assert isinstance(pos_condistion, list)
+        # [ ('', '', '') ]
+
+        return [
+            tuple(self.convert_str(p_c_tuple))
+            for p_c_tuple
+            in pos_condistion
+        ]
+
+    def filter(self, parsed_sentence, pos_condition=None, stopwords=None):
+        assert isinstance(parsed_sentence, TokenizedSenetence)
+        assert isinstance(pos_condition, (type(None), list))
+        assert isinstance(stopwords, (type(None), list))
+
+        if isinstance(stopwords, type(None)):
+            s_words = []
+        else:
+            s_words = stopwords
+
+        if isinstance(pos_condition, type(None)):
+            p_condition = []
+        else:
+            p_condition = self.__check_pos_condition_str(pos_condition)
+
+        filtered_object = filter.filter_words(
+            tokenized_obj=parsed_sentence,
+            valid_pos=p_condition,
+            stopwords=s_words
+        )
+        assert isinstance(filtered_object, FilteredObject)
+
+        return filtered_object

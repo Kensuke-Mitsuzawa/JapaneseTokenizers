@@ -5,3 +5,5 @@ dist/
 *pyc
 morphogySplitters/
 .DS_Store
+test_env/
+test_env_3
