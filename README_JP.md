@@ -1,6 +1,12 @@
 # What's this?
 
 形態素解析器をできる限り簡単に使うことを目的にしたパッケージです。
+
+Python2.xとPython3.xの両方で使うことを意識して作成しています。
+
+Python2.xはPython2.7.9で、Python3.xはPython3.xで動作確認をしています。
+
+バグ報告等はgithub issueまで。Pull requestも歓迎です。
  
 # Setting up
 

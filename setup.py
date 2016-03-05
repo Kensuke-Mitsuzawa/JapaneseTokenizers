@@ -13,7 +13,7 @@ else:
 setup(
     author='Kensuke Mitsuzawa',
     name = 'JapaneseTokenizer',
-    version='0.5',
+    version='0.6',
     test_suite='JapaneseTokenizer.test.test_all.suite',
     install_requires = install_requires,
     packages=find_packages(),

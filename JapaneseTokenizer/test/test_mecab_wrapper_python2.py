@@ -16,8 +16,7 @@ class TestMecabWrapperPython2(unittest.TestCase):
 
     def test_init_mecab_wrapper(self):
         dictType = "neologd"
-        osType = "mac"
-        mecab_obj = MecabWrapper(dictType=dictType, osType="mac")
+        mecab_obj = MecabWrapper(dictType=dictType)
         assert isinstance(mecab_obj, MecabWrapper)
 
         return mecab_obj
@@ -38,7 +37,7 @@ class TestMecabWrapperPython2(unittest.TestCase):
         dictType = "user"
         osType = "mac"
 
-        mecab_obj = MecabWrapper(dictType=dictType, osType=osType, pathUserDictCsv=self.path_user_dict)
+        mecab_obj = MecabWrapper(dictType=dictType, pathUserDictCsv=self.path_user_dict, osType=osType)
         assert isinstance(mecab_obj, MecabWrapper)
 
         res = mecab_obj.tokenize(sentence=self.test_senetence)

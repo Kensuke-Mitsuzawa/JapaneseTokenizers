@@ -17,14 +17,17 @@ python_version = sys.version_info
 
 class MecabWrapper:
 
-    def __init__(self, dictType, osType, pathUserDictCsv=''):
+    def __init__(self, dictType, pathUserDictCsv='', path_mecab_config='/usr/local/bin/', osType=''):
         assert dictType in ["neologd", "all", "ipaddic", "user", ""]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
+        self._path_mecab_config = path_mecab_config
+        if osType != '':
+            logging.warn('osType argument is abolished. This argument might be unavailable in next version.')
 
-        self._osType = osType
         self._dictType = dictType
         self._pathUserDictCsv = pathUserDictCsv
         self._mecab_dictionary_path = self.__check_mecab_dict_path()
+
         logging.info("mecab dictionary path is detected under {}".format(self._mecab_dictionary_path))
 
         self.mecabObj = self.__CallMecab()
@@ -34,31 +37,32 @@ class MecabWrapper:
         """check path to dict of Mecab in system environment
         """
 
-        if self._osType=="centos":
-            mecab_dic_cmd = "echo `/usr/local/bin/mecab-config --dicdir`"
-        else:
-            mecab_dic_cmd = 'echo `mecab-config --dicdir`'
+        mecab_dic_cmd = "echo `{} --dicdir`".format(os.path.join(self._path_mecab_config, 'mecab-config'))
+
         try:
             path_mecab_dict = subprocess.check_output( mecab_dic_cmd, shell=True  ).strip('\n')
         except subprocess.CalledProcessError:
             logging.error("{}".format(mecab_dic_cmd))
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to execute mecab-config command")
+        if path_mecab_dict == '':
+            raise SystemError(
+                'mecab dictionary path is not found with following command: {} You are not able to use additional dictionary. Still you are able to call mecab default dictionary'.format(mecab_dic_cmd)
+            )
 
         return path_mecab_dict
 
 
     def __check_mecab_libexe(self):
 
-        if self._osType=="centos":
-            mecab_libexe_cmd = "echo `/usr/local/bin/mecab-config --libexecdir`"
-        else:
-            mecab_libexe_cmd = 'echo `mecab-config --libexecdir`'
+        mecab_libexe_cmd = "echo `{} --libexecdir`".format(os.path.join(self._path_mecab_config, 'mecab-config'))
 
         try:
             path_mecab_libexe = subprocess.check_output( mecab_libexe_cmd, shell=True  ).strip('\n')
         except subprocess.CalledProcessError:
             logging.error("{}".format(mecab_libexe_cmd))
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to execute mecab-config --libexecdir")
+        if path_mecab_libexe == '':
+            raise SystemError('Mecab config is not callable with following command: {} You are not able to compile your user dictionary. Still, you are able to use default mecab dictionary.'.format(mecab_libexe_cmd))
 
         return path_mecab_libexe
 
@@ -149,7 +153,6 @@ class MecabWrapper:
 
         return tuple_pos, word_stem
 
-
     def tokenize(self, sentence, is_feature=False, is_surface=False, return_list=True):
         """
         :param sentence:
@@ -160,13 +163,11 @@ class MecabWrapper:
         """
 
         assert isinstance(sentence, unicode)
-
         tokenized_objects = []
-        list_sentence_processed = []  # list to save word stem of posted contents
-        normalized_sentence = normalize_text(sentence)
+
+        normalized_sentence = normalize_text(sentence, self._dictType)
 
         # don't delete this variable. encoded_text protects sentence from deleting
-
         encoded_text = normalized_sentence.encode('utf-8')
 
         node = self.mecabObj.parseToNode(encoded_text)
@@ -211,7 +212,7 @@ class MecabWrapper:
     def convert_str(self, p_c_tuple):
         converted = []
         for item in p_c_tuple:
-            if isinstance(item, str): converted.append(u(item))
+            if isinstance(item, str): converted.append(item)
             else: converted.append(item)
         return converted
 

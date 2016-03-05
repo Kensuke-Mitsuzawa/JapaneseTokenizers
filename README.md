@@ -4,6 +4,8 @@ This is simple wrapper for Japanese Tokenizers(A.K.A Morphology Splitter)
 
 This repository aims to call Tokenizer and split into tokens in one line.
 
+If you find any bugs, please report them to github issues. Or any pull requests are welcomed!
+
 # Features
 
 * put sentence and get set of tokens
@@ -16,10 +18,6 @@ This repository aims to call Tokenizer and split into tokens in one line.
 ## Python version
 
 This package works under both of python2x and python3x.
-
-But I checked mainly under python2x.
-
-So, I'm glad if you find any bugs in python3x and report it.
 
 ## MeCab system
 

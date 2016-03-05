@@ -17,9 +17,12 @@ python_version = sys.version_info
 
 class MecabWrapper:
 
-    def __init__(self, dictType, osType, pathUserDictCsv=''):
+    def __init__(self, dictType, pathUserDictCsv='', path_mecab_config='/usr/local/bin/', osType=''):
         assert dictType in ["neologd", "all", "ipaddic", "user", ""]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
+        self._path_mecab_config = path_mecab_config
+        if osType != '':
+            logging.warn('osType argument is abolished. This argument might be unavailable in next version.')
 
         self._osType = osType
         self._dictType = dictType
@@ -33,11 +36,7 @@ class MecabWrapper:
     def __check_mecab_dict_path(self):
         """check path to dict of Mecab in system environment
         """
-
-        if self._osType=="centos":
-            mecab_dic_cmd = "echo `/usr/local/bin/mecab-config --dicdir`"
-        else:
-            mecab_dic_cmd = "echo `/usr/local/bin/mecab-config --dicdir`"
+        mecab_dic_cmd = "echo `{} --dicdir`".format(os.path.join(self._path_mecab_config, 'mecab-config'))
 
         try:
             path_mecab_dict = subprocess.check_output( mecab_dic_cmd, shell=True  ).decode('utf-8').strip('\n')
@@ -56,10 +55,7 @@ class MecabWrapper:
 
     def __check_mecab_libexe(self):
 
-        if self._osType=="centos":
-            mecab_libexe_cmd = "echo `/usr/local/bin/mecab-config --libexecdir`"
-        else:
-            mecab_libexe_cmd = 'echo `/usr/local/bin/mecab-config --libexecdir`'
+        mecab_libexe_cmd = "echo `{} --libexecdir`".format(os.path.join(self._path_mecab_config, 'mecab-config'))
 
         try:
             path_mecab_libexe = subprocess.check_output( mecab_libexe_cmd, shell=True  ).decode('utf-8').strip('\n')
