@@ -4,7 +4,7 @@ This is simple wrapper for Japanese Tokenizers(A.K.A Morphology Splitter)
 
 This project aims to call Tokenizer and split into tokens as easy as possible.
 
-And this project supports some Tokenization tool. You can compare results among them.
+And this project supports various Tokenization tools. You can compare results among them.
 
 If you find any bugs, please report them to github issues. Or any pull requests are welcomed!
 
@@ -163,7 +163,8 @@ natto-py is sophisticated package for tokenization. It supports following featur
 
 * first release to Pypi
 
-## 0.7(2016-xx-xx)
+## 0.7(2016-03-06)
 
 * Juman supports(only for python2.x)
+* Kytea supports(only for python2.x)
 

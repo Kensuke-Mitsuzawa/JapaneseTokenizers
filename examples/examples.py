@@ -5,6 +5,7 @@ from JapaneseTokenizer import JumanWrapper
 from JapaneseTokenizer import MecabWrapper
 from JapaneseTokenizer import TokenizedSenetence
 from JapaneseTokenizer import FilteredObject
+from JapaneseTokenizer import KyteaWrapper
 from JapaneseTokenizer.datamodels import TokenizedResult
 __author__ = 'kensuke-mi'
 
@@ -28,7 +29,7 @@ def basic_example_mecab_2x():
 
     # you can choose from "neologd", "all", "ipaddic", "user", ""
     # "ipadic" and "" is equivalent
-    dictType = ""
+    dictType = "neologd"
 
     mecab_wrapper = MecabWrapper(dictType=dictType, path_mecab_config=path_mecab_config)
 
@@ -102,6 +103,32 @@ def basic_example_juman_2x():
             token_object.word_surface,
             token_object.tuple_pos))
 
+    # filtering is same as mecab
+
+
+def basic_example_kytea_2x():
+    # input is `unicode` type(in python2x)
+    sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+
+    kytea_wrapper = KyteaWrapper()
+    tokenized_objects = kytea_wrapper.tokenize(
+        sentence=sentence,
+        normalize=True,
+        return_list=False
+    )
+    assert isinstance(tokenized_objects, TokenizedSenetence)
+    print('-'*30)
+    print(u'Kytea Demo')
+    for token_object in tokenized_objects.tokenized_objects:
+        assert isinstance(token_object, TokenizedResult)
+        # kytea does not show word stem, thus word_stem attribute is always null string
+        # instead kytea tells you inferred Yomi, pronounciation
+        print(u'word_surafce:{}, pos:{}, yomi:{}, yomi_score:{}'.format(
+            token_object.word_surface,
+            token_object.tuple_pos,
+            token_object.misc_info['yomi'],
+            token_object.misc_info['yomi_score'],
+        ))
 
 def advanced_example_mecab_2x():
     # ========================================================
@@ -216,3 +243,4 @@ if __name__ == "__main__":
         basic_example_mecab_2x()
         advanced_example_mecab_2x()
         basic_example_juman_2x()
+        basic_example_kytea_2x()
