@@ -47,17 +47,37 @@ class JumanWrapper:
 
         return token_object
 
-    def tokenize(self, sentence, is_feature=False, is_surface=False, return_list=True):
-        """
-        :param sentence:
-        :param ins_mecab:
-        :param list_stopword:
-        :param list_pos_candidate:
-        :return:  list [tuple (unicode, unicode)]
-        """
-        assert isinstance(sentence, unicode)
 
-        normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
+    def call_juman_tokenize_api(self, sentence):
+        """This method calls pyknp.juman.analysis
+        Return object is `MList`
+
+        :rtype: pyknp.MList
+        """
+        result = self.juman.analysis(sentence)
+        assert isinstance(result, pyknp.MList)
+
+        return result
+
+
+    def tokenize(self, sentence, normalize=True, is_feature=False, is_surface=False, return_list=True):
+        """This method returns tokenized result.
+        If return_list==True(default), this method returns list whose element is tuple consisted with word_stem and POS.
+        If return_list==False, this method returns TokenizedSenetence object.
+
+        :param sentence: input sentence. unicode
+        :param normalize: boolean flag to make string normalization before tokenization
+        :param is_feature:
+        :param is_surface:
+        :param return_list:
+        :return:
+        """
+        assert isinstance(normalize, bool)
+        assert isinstance(sentence, unicode)
+        if normalize:
+            normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
+        else:
+            normalized_sentence = sentence
 
         result = self.juman.analysis(normalized_sentence)
         token_objects = [

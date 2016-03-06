@@ -1,6 +1,7 @@
 #! -*- coding: utf-8 -*-
 import sys
 import os
+from JapaneseTokenizer import JumanWrapper
 from JapaneseTokenizer import MecabWrapper
 from JapaneseTokenizer import TokenizedSenetence
 from JapaneseTokenizer import FilteredObject
@@ -12,7 +13,7 @@ python_version = sys.version_info
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # for python2.x
 
-def basic_example_2x():
+def basic_example_mecab_2x():
     # ========================================================
     # TOKENIZE
     # ========================================================
@@ -53,6 +54,15 @@ def basic_example_2x():
         stopwords=stopwords
     )
     assert isinstance(filtered_obj, FilteredObject)
+    #
+    print('-'*30)
+    print(u'Mecab Demo')
+    for token_obj in filtered_obj.tokenized_objects:
+        assert isinstance(token_obj, TokenizedResult)
+        print(u'word_stem:{}, word_surafce:{}, pos:{}'.format(
+            token_obj.word_stem,
+            token_obj.word_surface,
+            token_obj.tuple_pos))
 
     # pos condition is list of tuples
     # You can set POS condition "ChaSen 品詞体系 (IPA品詞体系)" of this page http://www.unixuser.org/~euske/doc/postag/#chasen
@@ -62,9 +72,38 @@ def basic_example_2x():
         pos_condition=pos_condition
     )
     assert isinstance(filtered_obj, FilteredObject)
+    print('-'*30)
+    print(u'Mecab Filtering Demo')
+    for token_obj in filtered_obj.tokenized_objects:
+        assert isinstance(token_obj, TokenizedResult)
+        print(u'word_stem:{}, word_surafce:{}, pos:{}'.format(
+            token_obj.word_stem,
+            token_obj.word_surface,
+            token_obj.tuple_pos))
 
 
-def advanced_example_2x():
+def basic_example_juman_2x():
+    # input is `unicode` type(in python2x)
+    sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+
+    juman_wrapper = JumanWrapper()
+    tokenized_objects = juman_wrapper.tokenize(
+        sentence=sentence,
+        normalize=True,
+        return_list=False
+    )
+    assert isinstance(tokenized_objects, TokenizedSenetence)
+    print('-'*30)
+    print(u'Juman Demo')
+    for token_object in tokenized_objects.tokenized_objects:
+        assert isinstance(token_object, TokenizedResult)
+        print(u'word_stem:{}, word_surafce:{}, pos:{}'.format(
+            token_object.word_stem,
+            token_object.word_surface,
+            token_object.tuple_pos))
+
+
+def advanced_example_mecab_2x():
     # ========================================================
     # USE YOUE OWN DICTIONARY
     # with your own dictionary, you can force Mecab to make some word into one token
@@ -79,6 +118,8 @@ def advanced_example_2x():
         dictType='user',
         pathUserDictCsv=example_user_dict
     )
+    print('-'*30)
+    print(u'Mecab UserDictionary Demo')
     sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
     tokenized_obj = mecab_wrapper.tokenize(sentence, return_list=False)
     assert isinstance(tokenized_obj, TokenizedSenetence)
@@ -172,5 +213,6 @@ if __name__ == "__main__":
         basic_example_3x()
         advanced_example_3x()
     else:
-        basic_example_2x()
-        advanced_example_2x()
+        basic_example_mecab_2x()
+        advanced_example_mecab_2x()
+        basic_example_juman_2x()

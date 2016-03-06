@@ -1,16 +1,26 @@
 #! -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 import sys
-import install_python_dependencies
+
 python_version = sys.version_info
 
+
+# check required libraries
+try:
+    import jctconv
+    import pypandoc
+    import MeCab
+    import pyknp
+except:
+    # install them if any of them is not installed
+    import install_python_dependencies
 
 if python_version >= (3, 0, 0):
     install_requires = ['mecab-python3', 'jctconv']
 else:
-    install_requires = ['mecab-python', 'jctconv']
+    install_requires = ['mecab-python', 'jctconv', 'kytea']
 
-version = '0.6a1'
+version = '0.7'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
@@ -36,7 +46,8 @@ setup(
     version=version,
     short_description=short_description,
     long_description=long_description,
-    keywords = ['MeCab', '和布蕪', 'Japanese morphological analyzer', 'NLP', '形態素解析', '自然言語処理'],
+    keywords = ['MeCab', '和布蕪', 'Juman',
+                'Japanese morphological analyzer', 'NLP', '形態素解析', '自然言語処理'],
     license = "MIT",
     url = "https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers",
     test_suite='test.test_all.suite',

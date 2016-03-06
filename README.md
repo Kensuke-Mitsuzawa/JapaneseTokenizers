@@ -2,7 +2,9 @@
 
 This is simple wrapper for Japanese Tokenizers(A.K.A Morphology Splitter)
 
-This repository aims to call Tokenizer and split into tokens in one line.
+This project aims to call Tokenizer and split into tokens as easy as possible.
+
+And this project supports some Tokenization tool. You can compare results among them.
 
 If you find any bugs, please report them to github issues. Or any pull requests are welcomed!
 
@@ -18,11 +20,34 @@ If you find any bugs, please report them to github issues. Or any pull requests 
 * You can filter some tokens with your Part-of-Speech condition or stopwords
 * You can add extension dictionary like mecab-neologd dictionary
 * You can define your original dictionary. And this dictionary forces mecab to make it one token
+
+## Supported Tokenization tool
+
+### Mecab
+
+[Mecab](http://mecab.googlecode.com/svn/trunk/mecab/doc/index.html?sess=3f6a4f9896295ef2480fa2482de521f6) is open source tokenization system for various language(if you have dictionary for it)
+
+See [english documentation](https://github.com/jordwest/mecab-docs-en) for detail
+
+### Juman
+
+[Juman](http://nlp.ist.i.kyoto-u.ac.jp/EN/index.php?JUMAN) is tokenization tool developped by Kurohashi laboratory, Kyoto University, Japan.
+
+Juman is strong for ambigious writing style in Japanese, and is strong for new-comming words thanks to Web based huge dictionary.
+ 
+And, Juman tells you semantic meaning of words.
+
+### Kytea
+
+[Kytea](http://www.phontron.com/kytea/) is tokenization tool developped by Graham Neubig.
+
+Kytea has a different algorithm from one of Mecab or Juman. 
+
  
 # Setting up
 
 
-## MeCab system
+## MeCab
 
 See [here](https://github.com/jordwest/mecab-docs-en) to install MeCab system.
 
@@ -36,6 +61,35 @@ Here, new-coming words is suche like, movie actor name or company name.....
 
 See [here](https://github.com/neologd/mecab-ipadic-neologd) and install mecab-neologd dictionary.
 
+## Juman
+
+    wget -O juman7.0.1.tar.bz2 "http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/juman/juman-7.01.tar.bz2&name=juman-7.01.tar.bz2"
+    bzip2 -dc juman7.0.1.tar.bz2  | tar xvf -
+    cd juman-7.01
+    ./configure
+    make   
+    [sudo] make install
+    
+## Kytea
+
+Install Kytea system
+
+    wget http://www.phontron.com/kytea/download/kytea-0.4.7.tar.gz
+    tar -xvf kytea-0.4.7.tar
+    cd kytea-0.4.7
+    ./configure
+    make
+    make install
+    
+    
+Kytea has [python wrapper](https://github.com/chezou/Mykytea-python) thanks to michiaki ariga.
+Install Kytea-python wrapper
+
+    pip install kytea
+    git clone https://github.com/chezou/Mykytea-python
+    make
+    [sudo] make install
+    
 
 ## install
 
@@ -108,3 +162,8 @@ natto-py is sophisticated package for tokenization. It supports following featur
 ## 0.6(2016-03-05)
 
 * first release to Pypi
+
+## 0.7(2016-xx-xx)
+
+* Juman supports(only for python2.x)
+
