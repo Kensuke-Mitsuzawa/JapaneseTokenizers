@@ -80,16 +80,12 @@ Install Kytea system
     ./configure
     make
     make install
-    
-    
+
+
 Kytea has [python wrapper](https://github.com/chezou/Mykytea-python) thanks to michiaki ariga.
 Install Kytea-python wrapper
 
     pip install kytea
-    git clone https://github.com/chezou/Mykytea-python
-    make
-    [sudo] make install
-    
 
 ## install
 
