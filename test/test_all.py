@@ -9,6 +9,8 @@ def suite():
     suite = unittest.TestSuite()
     if python_version >= (3, 0, 0):
         from .test_mecab_wrapper_python3 import TestMecabWrapperPython3
+        from .test_kytea_wrapper_python3 import TestKyteaWrapperPython3
+        suite.addTest(unittest.makeSuite(TestKyteaWrapperPython3))
         suite.addTest(unittest.makeSuite(TestMecabWrapperPython3))
     else:
         from .test_mecab_wrapper_python2 import TestMecabWrapperPython2

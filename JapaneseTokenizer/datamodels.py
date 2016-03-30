@@ -43,17 +43,19 @@ if python_version >= (3, 0, 0):
 
 
     class TokenizedResult(object):
-        def __init__(self, analyzed_line, tuple_pos, word_stem, word_surface, is_feature=True, is_surface=False):
-            assert isinstance(analyzed_line, str)
+        def __init__(self, analyzed_line, tuple_pos, word_stem, word_surface, is_feature=True, is_surface=False, misc_info=None):
+            assert isinstance(analyzed_line, (str, type(None)))
             assert isinstance(tuple_pos, (str, tuple))
             assert isinstance(word_stem, (str))
             assert isinstance(word_surface, (str))
+            assert isinstance(misc_info, (type(None), dict))
 
             self.analyzed_line = analyzed_line
             self.word_stem = word_stem
             self.word_surface = word_surface
             self.is_surface = is_surface
             self.is_feature = is_feature
+            self.misc_info = misc_info
 
             if isinstance(tuple_pos, tuple):
                 self.tuple_pos = tuple_pos

@@ -8,7 +8,8 @@ logging.basicConfig(level=logging.DEBUG,
 python_version = sys.version_info
 
 if python_version > (3, 0, 0):
-    raise SystemError('Kytea for python3 is not implemented yet')
+    from JapaneseTokenizer.kytea_wrapper.kytea_wrapper_python3 import KyteaWrapper
+    KyteaWrapper = KyteaWrapper
 
 else:
     from JapaneseTokenizer.kytea_wrapper.kytea_wrapper_python2 import KyteaWrapper
