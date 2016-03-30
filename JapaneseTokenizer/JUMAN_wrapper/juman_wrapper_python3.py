@@ -1,4 +1,4 @@
-from JapaneseTokenizer.JUMAN_wrapper import text_preprocess
+from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
 import pyknp
