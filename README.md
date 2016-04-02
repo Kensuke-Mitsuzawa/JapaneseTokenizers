@@ -168,3 +168,7 @@ natto-py is sophisticated package for tokenization. It supports following featur
 * Juman supports(only for python2.x)
 * Kytea supports(only for python2.x)
 
+## 0.8(2016-04-03)
+
+* removed a bug when interface calls JUMAN
+* fixed the version number of jctconv 
