@@ -16,11 +16,11 @@ except:
     import install_python_dependencies
 
 if python_version >= (3, 0, 0):
-    install_requires = ['mecab-python3', 'jctconv']
+    install_requires = ['mecab-python3', 'jctconv==0.1.2']
 else:
-    install_requires = ['mecab-python', 'jctconv', 'kytea']
+    install_requires = ['mecab-python', 'jctconv==0.1.2', 'kytea']
 
-version = '0.7'
+version = '0.8'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 

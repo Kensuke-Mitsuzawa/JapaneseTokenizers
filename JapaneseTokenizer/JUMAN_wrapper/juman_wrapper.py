@@ -11,5 +11,5 @@ if python_version > (3, 0, 0):
     raise SystemError('Juman for python3 is not implemented yet')
 
 else:
-    from JapaneseTokenizer.juman_wrapper.juman_wrapper_python2 import JumanWrapper
+    from JapaneseTokenizer.JUMAN_wrapper.juman_wrapper_python2 import JumanWrapper
     JumanWrapper = JumanWrapper

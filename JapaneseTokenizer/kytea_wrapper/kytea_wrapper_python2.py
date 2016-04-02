@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from JapaneseTokenizer.juman_wrapper import text_preprocess
+from JapaneseTokenizer.JUMAN_wrapper import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
 import Mykytea
