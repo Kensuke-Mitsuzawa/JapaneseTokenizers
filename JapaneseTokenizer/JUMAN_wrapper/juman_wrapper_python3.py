@@ -1,7 +1,6 @@
 from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
-import pyknp
 import logging
 import sys
 __author__ = 'kensuke-mi'
@@ -13,6 +12,7 @@ python_version = sys.version_info
 
 class JumanWrapper:
     def __init__(self):
+        '''
         self.juman = pyknp.Juman()
 
     def __feature_parser(self, uni_feature, word_surface):
@@ -95,4 +95,4 @@ class JumanWrapper:
         )
         assert isinstance(filtered_object, FilteredObject)
 
-        return filtered_object
+        return filtered_object'''
