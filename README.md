@@ -6,6 +6,8 @@ This project aims to call Tokenizer and split into tokens as easy as possible.
 
 And this project supports various Tokenization tools. You can compare results among them.
 
+This project is available also in [Github](https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers).  
+
 If you find any bugs, please report them to github issues. Or any pull requests are welcomed!
 
 # Requirements
@@ -55,9 +57,9 @@ See [here](https://github.com/jordwest/mecab-docs-en) to install MeCab system.
 
 Mecab-neologd dictionary is a dictionary-extension based on ipadic-dictionary, which is basic dictionary of Mecab.
 
-With, Mecab-neologd dictionary, you're able to new-coming words make one token.
+With, Mecab-neologd dictionary, you're able to parse new-coming words make one token.
 
-Here, new-coming words is suche like, movie actor name or company name.....
+Here, new-coming words is such like, movie actor name or company name.....
 
 See [here](https://github.com/neologd/mecab-ipadic-neologd) and install mecab-neologd dictionary.
 
@@ -167,4 +169,8 @@ natto-py is sophisticated package for tokenization. It supports following featur
 ## 0.8(2016-04-03)
 
 * removed a bug when interface calls JUMAN
-* fixed the version number of jctconv 
+* fixed the version number of jctconv
+ 
+## 0.9 (2016-04-05)
+
+* Kytea supports also for Python3.x(Thanks to @chezou)

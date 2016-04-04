@@ -20,7 +20,7 @@ if python_version >= (3, 0, 0):
 else:
     install_requires = ['mecab-python', 'jctconv==0.1.2', 'kytea']
 
-version = '0.8'
+version = '0.9'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
