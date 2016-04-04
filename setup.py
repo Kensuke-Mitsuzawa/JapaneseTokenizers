@@ -16,7 +16,7 @@ except:
     import install_python_dependencies
 
 if python_version >= (3, 0, 0):
-    install_requires = ['mecab-python3', 'jctconv==0.1.2']
+    install_requires = ['mecab-python3', 'jctconv==0.1.2', 'kytea']
 else:
     install_requires = ['mecab-python', 'jctconv==0.1.2', 'kytea']
 
