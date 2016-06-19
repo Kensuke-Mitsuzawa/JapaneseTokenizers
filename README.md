@@ -88,6 +88,14 @@ Kytea has [python wrapper](https://github.com/chezou/Mykytea-python) thanks to m
 Install Kytea-python wrapper
 
     pip install kytea
+    
+# Part-of-speech structure
+
+Mecab, Juman uses different system of Part-of-Speech(POS).
+
+Keep in your mind when you use it.
+
+You can check tables of Part-of-Speech(POS) [here](http://www.unixuser.org/~euske/doc/postag/)
 
 ## install
 
