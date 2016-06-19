@@ -20,7 +20,7 @@ if python_version >= (3, 0, 0):
 else:
     install_requires = ['future', 'six', 'mecab-python', 'jctconv==0.1.2', 'pyknp==0.22']
 
-version = '1.0'
+version = '1.0a'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
