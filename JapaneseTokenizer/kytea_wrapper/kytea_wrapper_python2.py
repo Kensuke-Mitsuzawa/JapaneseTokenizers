@@ -2,19 +2,26 @@
 from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
-import Mykytea
+from future.utils import string_types
 import logging
 import sys
-__author__ = 'kensuke-mi'
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s %(levelname)s %(message)s")
 python_version = sys.version_info
 
 
+try:
+    import Mykytea
+except ImportError:
+    logging.error(msg='Mykytea is not ready to use yet. Install first')
+
+__author__ = 'kensuke-mi'
+
+
 class KyteaWrapper:
     def __init__(self, option_string=''):
-        assert isinstance(option_string, (str, unicode))
+        assert isinstance(option_string, (str, string_types))
         # option string is argument of Kytea.
         self.kytea = Mykytea.Mykytea(option_string)
 
@@ -23,7 +30,7 @@ class KyteaWrapper:
         return [(word.surface, [[convert(t2) for t2 in t1] for t1 in word.tag]) for word in t]
 
     def __check_char_set(self, input_char):
-        if isinstance(input_char, unicode):
+        if isinstance(input_char, string_types):
             return input_char
         elif isinstance(input_char, str):
             return input_char.decode('utf-8')
@@ -72,7 +79,7 @@ class KyteaWrapper:
         """
         """
         result = self.kytea.getTagsToString(sentence)
-        assert isinstance(result, unicode)
+        assert isinstance(result, string_types)
 
         return result
 
@@ -89,7 +96,7 @@ class KyteaWrapper:
         :return:
         """
         assert isinstance(normalize, bool)
-        assert isinstance(sentence, unicode)
+        assert isinstance(sentence, string_types)
         if normalize:
             normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
         else:

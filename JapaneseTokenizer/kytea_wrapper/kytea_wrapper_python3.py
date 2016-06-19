@@ -2,14 +2,21 @@
 from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
-import Mykytea
 import logging
 import sys
-__author__ = 'kensuke-mi'
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s %(levelname)s %(message)s")
 python_version = sys.version_info
+
+try:
+    import Mykytea
+except ImportError:
+    logging.error(msg='Mykytea is not ready to use yet. Install first')
+
+__author__ = 'kensuke-mi'
+
+
 
 
 class KyteaWrapper:
@@ -61,7 +68,8 @@ class KyteaWrapper:
             word_surface=surface,
             is_feature=is_feature,
             is_surface=True,
-            misc_info=misc_info
+            misc_info=misc_info,
+            node_obj=None
         )
 
         return token_object

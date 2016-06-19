@@ -7,6 +7,7 @@ import MeCab
 from JapaneseTokenizer.mecab_wrapper.text_preprocess import normalize_text
 from ..common.filter import filter_words
 from ..datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
+from future.utils import string_types
 __author__ = 'kensuke-mi'
 
 
@@ -162,7 +163,7 @@ class MecabWrapper:
         :return:  list [tuple (unicode, unicode)]
         """
 
-        assert isinstance(sentence, unicode)
+        assert isinstance(sentence, string_types)
         tokenized_objects = []
 
         normalized_sentence = normalize_text(sentence, self._dictType)

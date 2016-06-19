@@ -2,7 +2,7 @@
 from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
-import pyknp
+from future.utils import string_types
 import logging
 import sys
 __author__ = 'kensuke-mi'
@@ -11,10 +11,15 @@ logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s %(levelname)s %(message)s")
 python_version = sys.version_info
 
+try:
+    import pyknp
+except ImportError:
+    logging.error(msg='pyknp is not ready to use. Check your installing log.')
+
 
 class JumanWrapper:
-    def __init__(self):
-        self.juman = pyknp.Juman()
+    def __init__(self, command='juman', server=None, port=32000, timeout=30):
+        self.juman = pyknp.Juman(command=command, server=server, port=port, timeout=timeout)
 
     def __extract_morphological_information(self, mrph_object, is_feature, is_surface):
         """This method extracts morphlogical information from token object.
@@ -73,7 +78,7 @@ class JumanWrapper:
         :return:
         """
         assert isinstance(normalize, bool)
-        assert isinstance(sentence, unicode)
+        assert isinstance(sentence, string_types)
         if normalize:
             normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
         else:

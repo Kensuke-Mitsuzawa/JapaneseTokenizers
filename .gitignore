@@ -2,9 +2,10 @@
 JapaneseTokenizer.egg-info/
 build/
 dist/
+*eggs/
+pyknp.egg-info/
+.python-version
 *pyc
 morphogySplitters/
 Mykytea-python/
 .DS_Store
-test_env/
-test_env_3

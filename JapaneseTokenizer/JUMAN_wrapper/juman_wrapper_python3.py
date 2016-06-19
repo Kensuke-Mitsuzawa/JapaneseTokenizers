@@ -1,6 +1,6 @@
-from JapaneseTokenizer.common import text_preprocess
+from JapaneseTokenizer.common import text_preprocess, filter
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
-from JapaneseTokenizer.common import filter
+from typing import List, Dict, Tuple, Union, TypeVar
 import logging
 import sys
 __author__ = 'kensuke-mi'
@@ -8,14 +8,51 @@ __author__ = 'kensuke-mi'
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s %(levelname)s %(message)s")
 python_version = sys.version_info
+ContentsTypes = TypeVar('T')
+
+try:
+    import pyknp
+except ImportError:
+    logging.error(msg='pyknp is not ready to use. Check your installing log.')
 
 
 class JumanWrapper:
-    def __init__(self):
-        '''
-        self.juman = pyknp.Juman()
+    def __init__(self, command:str='juman', server:Union[str,None]=None, port:int=32000, timeout:int=30):
+        self.juman = pyknp.Juman(command=command, server=server, port=port, timeout=timeout)
+        self.timeout = timeout
 
-    def __feature_parser(self, uni_feature, word_surface):
+    def __extract_morphological_information(self, mrph_object:pyknp.Morpheme, is_feature:bool, is_surface:bool)->TokenizedResult:
+        """This method extracts morphlogical information from token object.
+        """
+        assert isinstance(mrph_object, pyknp.Morpheme)
+        assert isinstance(is_feature, bool)
+        assert isinstance(is_surface, bool)
+
+        surface = mrph_object.midasi
+        word_stem = mrph_object.genkei
+
+        tuple_pos = (mrph_object.hinsi, mrph_object.bunrui)
+
+        misc_info = {
+            'katuyou1': mrph_object.katuyou1,
+            'katuyou2': mrph_object.katuyou2,
+            'imis': mrph_object.imis,
+            'repname': mrph_object.repname
+        }
+
+        token_object = TokenizedResult(
+            node_obj=None,
+            tuple_pos=tuple_pos,
+            word_stem=word_stem,
+            word_surface=surface,
+            is_feature=is_feature,
+            is_surface=is_surface,
+            misc_info=misc_info
+        )
+
+        return token_object
+
+    def __feature_parser(self, uni_feature:str, word_surface:str)->Tuple[Tuple[str,str,str,],str]:
         """
         Parse the POS feature output by Mecab
         :param uni_feature unicode:
@@ -39,8 +76,10 @@ class JumanWrapper:
 
         return tuple_pos, word_stem
 
-
-    def tokenize(self, sentence, is_feature=False, is_surface=False, return_list=True):
+    def tokenize(self, sentence:str, normalize:bool=True,
+                 is_feature:bool=False,
+                 is_surface:bool=False,
+                 return_list:bool=True)->Union[List[ContentsTypes], TokenizedSenetence]:
         """
         :param sentence:
         :param ins_mecab:
@@ -48,13 +87,34 @@ class JumanWrapper:
         :param list_pos_candidate:
         :return:  list [tuple (unicode, unicode)]
         """
+        assert isinstance(normalize, bool)
         assert isinstance(sentence, str)
+        if normalize:
+            normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
+        else:
+            normalized_sentence = sentence
 
-        tokenized_objects = []
-        list_sentence_processed = []  # list to save word stem of posted contents
-        normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
+        result = self.juman.analysis(normalized_sentence)
+        token_objects = [
+            self.__extract_morphological_information(
+                mrph_object=morph_object,
+                is_surface=is_surface,
+                is_feature=is_feature
+            )
+            for morph_object in result]
 
-        # ここにjumanを呼び出す処理を記述
+        if return_list:
+            tokenized_objects = TokenizedSenetence(
+                sentence=sentence,
+                tokenized_objects=token_objects
+            )
+            return tokenized_objects.convert_list_object()
+        else:
+            tokenized_objects = TokenizedSenetence(
+                sentence=sentence,
+                tokenized_objects=token_objects)
+
+            return tokenized_objects
 
     def convert_str(self, p_c_tuple):
         converted = []
@@ -73,7 +133,7 @@ class JumanWrapper:
             in pos_condistion
         ]
 
-    def filter(self, parsed_sentence, pos_condition=None, stopwords=None):
+    def filter(self, parsed_sentence:TokenizedSenetence, pos_condition=None, stopwords=None)->FilteredObject:
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
@@ -95,4 +155,4 @@ class JumanWrapper:
         )
         assert isinstance(filtered_object, FilteredObject)
 
-        return filtered_object'''
+        return filtered_object

@@ -3,6 +3,7 @@
 # do your test with command line
 from __future__ import absolute_import
 from __future__ import division
+from future.utils import string_types, text_type
 from pyknp import Juman
 from JapaneseTokenizer.datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
 from JapaneseTokenizer.juman_wrapper.juman_wrapper_python2 import JumanWrapper
@@ -49,8 +50,8 @@ class TestJumanWrapperPython2(unittest.TestCase):
                 ' '.join(t_obj.tuple_pos),
                 t_obj.misc_info
             ))
-            assert isinstance(t_obj.word_surface, unicode)
-            assert isinstance(t_obj.word_stem, unicode)
+            assert isinstance(t_obj.word_surface, string_types)
+            assert isinstance(t_obj.word_stem, string_types)
             assert isinstance(t_obj.tuple_pos, tuple)
             assert isinstance(t_obj.misc_info, dict)
 
@@ -61,10 +62,10 @@ class TestJumanWrapperPython2(unittest.TestCase):
             assert isinstance(stem_posTuple, tuple)
             word_stem = stem_posTuple[0]
             word_posTuple = stem_posTuple[1]
-            assert isinstance(word_stem, unicode)
+            assert isinstance(word_stem, string_types)
             assert isinstance(word_posTuple, tuple)
 
-            print u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple))
+            print(u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple)))
 
     def test_filter_pos(self):
         """
@@ -91,8 +92,8 @@ class TestJumanWrapperPython2(unittest.TestCase):
                 ' '.join(t_obj.tuple_pos),
                 t_obj.misc_info
             ))
-            assert isinstance(t_obj.word_surface, unicode)
-            assert isinstance(t_obj.word_stem, unicode)
+            assert isinstance(t_obj.word_surface, string_types)
+            assert isinstance(t_obj.word_stem, string_types)
             assert isinstance(t_obj.tuple_pos, tuple)
             assert isinstance(t_obj.misc_info, dict)
 
@@ -103,10 +104,10 @@ class TestJumanWrapperPython2(unittest.TestCase):
             assert isinstance(stem_posTuple, tuple)
             word_stem = stem_posTuple[0]
             word_posTuple = stem_posTuple[1]
-            assert isinstance(word_stem, unicode)
+            assert isinstance(word_stem, string_types)
             assert isinstance(word_posTuple, tuple)
 
-            print u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple))
+            print(u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple)))
 
     def test_stopwords(self):
         stopword = [u'ＡＶ', u'女優']
@@ -127,10 +128,10 @@ class TestJumanWrapperPython2(unittest.TestCase):
             assert isinstance(stem_posTuple, tuple)
             word_stem = stem_posTuple[0]
             word_posTuple = stem_posTuple[1]
-            assert isinstance(word_stem, unicode)
+            assert isinstance(word_stem, string_types)
             assert isinstance(word_posTuple, tuple)
 
-            print u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple))
+            print(u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple)))
             if word_stem in stopword: check_flag = False
         assert check_flag
 

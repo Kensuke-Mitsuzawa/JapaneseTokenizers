@@ -174,3 +174,7 @@ natto-py is sophisticated package for tokenization. It supports following featur
 ## 0.9 (2016-04-05)
 
 * Kytea supports also for Python3.x(Thanks to @chezou)
+
+## 1.0 (2016-06-19)
+
+* Juman supports also for Python3.x

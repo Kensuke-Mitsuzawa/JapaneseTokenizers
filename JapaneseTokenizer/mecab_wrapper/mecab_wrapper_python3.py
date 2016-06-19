@@ -7,6 +7,8 @@ import MeCab
 from JapaneseTokenizer.mecab_wrapper.text_preprocess import normalize_text
 from ..common.filter import filter_words
 from ..datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
+from typing import List, Dict, Tuple, Union, TypeVar
+ContentsTypes = TypeVar('T')
 __author__ = 'kensuke-mi'
 
 
@@ -17,12 +19,12 @@ python_version = sys.version_info
 
 class MecabWrapper:
 
-    def __init__(self, dictType, pathUserDictCsv='', path_mecab_config='/usr/local/bin/', osType=''):
+    def __init__(self, dictType:str, pathUserDictCsv:str='', path_mecab_config:str='/usr/local/bin/', osType:str=''):
         assert dictType in ["neologd", "all", "ipaddic", "user", ""]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
         self._path_mecab_config = path_mecab_config
         if osType != '':
-            logging.warn('osType argument is abolished. This argument might be unavailable in next version.')
+            logging.warning('osType argument is abolished. This argument might be unavailable in next version.')
 
         self._osType = osType
         self._dictType = dictType
@@ -33,7 +35,7 @@ class MecabWrapper:
         self.mecabObj = self.__CallMecab()
 
 
-    def __check_mecab_dict_path(self):
+    def __check_mecab_dict_path(self)->str:
         """check path to dict of Mecab in system environment
         """
         mecab_dic_cmd = "echo `{} --dicdir`".format(os.path.join(self._path_mecab_config, 'mecab-config'))
@@ -53,7 +55,7 @@ class MecabWrapper:
         return path_mecab_dict
 
 
-    def __check_mecab_libexe(self):
+    def __check_mecab_libexe(self)->str:
 
         mecab_libexe_cmd = "echo `{} --libexecdir`".format(os.path.join(self._path_mecab_config, 'mecab-config'))
 
@@ -70,7 +72,7 @@ class MecabWrapper:
         return path_mecab_libexe
 
 
-    def __CallMecab(self):
+    def __CallMecab(self)->MeCab:
         """
         """
         if self._dictType == 'neologd':
@@ -108,7 +110,7 @@ class MecabWrapper:
         return mecabObj
 
 
-    def __CompileUserdict(self):
+    def __CompileUserdict(self)->str:
         # 複合語辞書のコンパイルをする
 
         path_mecab_dict = self.__check_mecab_dict_path()
@@ -156,7 +158,7 @@ class MecabWrapper:
         return tuple_pos, word_stem
 
 
-    def __postprocess_analyzed_result(self, string_mecab_parsed_result, is_feature, is_surface):
+    def __postprocess_analyzed_result(self, string_mecab_parsed_result:str, is_feature:bool, is_surface:bool)->List[TokenizedResult]:
         """Extract surface word and feature from analyzed lines.
         Extracted results are returned with list, whose elements are TokenizedResult class
         [TokenizedResult]
@@ -170,13 +172,13 @@ class MecabWrapper:
                                  is_surface=is_surface)
             for analyzed_line in string_mecab_parsed_result.split('\n')
             if not analyzed_line=='EOS' and check_tab_separated_line(analyzed_line)
-        ]
+        ] # type: List[TokenizedResult]
 
         assert isinstance(tokenized_objects, list)
         return tokenized_objects
 
 
-    def __result_parser(self, analyzed_line, is_feature, is_surface):
+    def __result_parser(self, analyzed_line:str, is_feature:bool, is_surface:bool)->TokenizedResult:
         """Extract surface word and feature from analyzed line.
         Extracted elements are returned with TokenizedResult class
         """
@@ -188,6 +190,7 @@ class MecabWrapper:
         surface, features = analyzed_line.split('\t')
         tuple_pos, word_stem = self.__feature_parser(features, surface)
         tokenized_obj = TokenizedResult(
+            node_obj=None,
             analyzed_line=analyzed_line,
             tuple_pos=tuple_pos,
             word_stem=word_stem,
@@ -197,7 +200,8 @@ class MecabWrapper:
         )
         return tokenized_obj
 
-    def tokenize(self, sentence, is_feature=False, is_surface=False, return_list=True):
+    def tokenize(self, sentence:str,
+                 is_feature:bool=False, is_surface:bool=False, return_list:bool=True)->Union[TokenizedSenetence, List[ContentsTypes]]:
         """
         :param sentence:
         :param ins_mecab:
@@ -221,7 +225,7 @@ class MecabWrapper:
         tokenized_sentence = TokenizedSenetence(
             sentence=sentence,
             tokenized_objects=tokenized_objects
-        )
+        ) # type: TokenizedSenetence
 
         if return_list:
             return tokenized_sentence.convert_list_object()
@@ -245,7 +249,7 @@ class MecabWrapper:
             in pos_condistion
         ]
 
-    def filter(self, parsed_sentence, pos_condition=None, stopwords=None):
+    def filter(self, parsed_sentence:TokenizedSenetence, pos_condition:bool=None, stopwords:bool=None)->FilteredObject:
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
