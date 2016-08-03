@@ -9,18 +9,19 @@ python_version = sys.version_info
 try:
     import jctconv
     import pypandoc
-    import MeCab
     import pyknp
 except:
     # install them if any of them is not installed
     import install_python_dependencies
 
 if python_version >= (3, 0, 0):
-    install_requires = ['future', 'six', 'mecab-python3', 'jctconv==0.1.2', 'pyknp==0.22']
+    install_requires = ['future', 'six', 'mecab-python3', 'jctconv==0.1.2', 'pyknp']
+    dependency_links = []
 else:
-    install_requires = ['future', 'six', 'mecab-python', 'jctconv==0.1.2', 'pyknp==0.22']
+    install_requires = ['future', 'six', 'mecab-python', 'jctconv==0.1.2', 'pyknp']
+    dependency_links = ['https://mecab.googlecode.com/files/mecab-python-0.996.tar.gz']
 
-version = '1.0b'
+version = '1.0b1'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
@@ -52,6 +53,7 @@ setup(
     url = "https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers",
     test_suite='test.test_all.suite',
     install_requires = install_requires,
+    dependency_links=dependency_links,
     packages=find_packages(),
     )
 
