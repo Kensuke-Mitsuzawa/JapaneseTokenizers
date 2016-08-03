@@ -21,7 +21,7 @@ else:
     install_requires = ['future', 'six', 'mecab-python', 'jctconv==0.1.2', 'pyknp']
     dependency_links = ['https://mecab.googlecode.com/files/mecab-python-0.996.tar.gz']
 
-version = '1.0b1'
+version = '1.0'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
