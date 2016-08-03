@@ -8,4 +8,4 @@ with open("requirement.txt") as f:
             if python_version < (3, 0, 0): pip.main(['install', line])
             else: pip.main(['install', 'mecab-python3'])
         else:
-            pip.main(['install', line])
+            pip.main(['install', line.strip()])
