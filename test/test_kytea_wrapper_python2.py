@@ -26,10 +26,10 @@ class TestKyteaWrapperPython2(unittest.TestCase):
         assert isinstance(tokenized_result_list, list)
         for t_obj_tuple in tokenized_result_list:
             assert isinstance(t_obj_tuple, tuple)
-            print u'word_surace: {}, word_pos_tuple: {}'.format(
+            print(u'word_surace: {}, word_pos_tuple: {}'.format(
                 t_obj_tuple[0],
                 u', '.join(t_obj_tuple[1])
-            )
+            ))
 
     def test_filter_pos(self):
         """
@@ -74,7 +74,7 @@ class TestKyteaWrapperPython2(unittest.TestCase):
             assert isinstance(word_stem, unicode)
             assert isinstance(word_posTuple, tuple)
 
-            print u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple))
+            print(u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple)))
 
 
     def test_stopwords(self):
@@ -100,7 +100,7 @@ class TestKyteaWrapperPython2(unittest.TestCase):
             assert isinstance(word_stem, unicode)
             assert isinstance(word_posTuple, tuple)
 
-            print u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple))
+            print(u'word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple)))
             if word_stem in stopword: check_flag = False
         assert check_flag
 
