@@ -6,22 +6,18 @@ python_version = sys.version_info
 
 
 # check required libraries
-try:
-    import jctconv
-    import pypandoc
-    import pyknp
-except:
-    # install them if any of them is not installed
-    import install_python_dependencies
-
 if python_version >= (3, 0, 0):
-    install_requires = ['future', 'six', 'mecab-python3', 'jctconv==0.1.2', 'pyknp']
-    dependency_links = []
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jctconv==0.1.2', 'pyknp', 'kytea']
+    dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/knp/pyknp-0.22.tar.gz#egg=pyknp-0.22',
+                        'https://github.com/chezou/Mykytea-python/zipball/master#egg=kytea'
+                        ]
 else:
-    install_requires = ['future', 'six', 'mecab-python', 'jctconv==0.1.2', 'pyknp']
-    dependency_links = ['https://mecab.googlecode.com/files/mecab-python-0.996.tar.gz']
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jctconv==0.1.2', 'pyknp', 'kytea']
+    dependency_links = ['https://mecab.googlecode.com/files/mecab-python-0.996.tar.gz#egg=mecab-python',
+                        'https://github.com/chezou/Mykytea-python/zipball/master#egg=kytea',
+                        'http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/knp/pyknp-0.22.tar.gz#egg=pyknp-0.22']
 
-version = '1.0'
+version = '1.1a'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
