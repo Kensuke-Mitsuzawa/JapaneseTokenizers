@@ -2,6 +2,7 @@
 from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
+from typing import List, Tuple, Any, Union
 from future.utils import string_types
 import logging
 import sys
@@ -30,14 +31,16 @@ class KyteaWrapper:
         return [(word.surface, [[convert(t2) for t2 in t1] for t1 in word.tag]) for word in t]
 
     def __check_char_set(self, input_char):
-        if isinstance(input_char, string_types):
-            return input_char
-        elif isinstance(input_char, str):
+        # type: (Union[str, unicode]) -> unicode
+        if isinstance(input_char, str):
             return input_char.decode('utf-8')
+        elif isinstance(input_char, unicode):
+            return input_char
         else:
             raise Exception('nor unicode, str')
 
     def __extract_morphological_information(self, kytea_tags_tuple, is_feature):
+        # type: (Tuple[str,List[Any]], bool) -> TokenizedResult
         """This method extracts morphlogical information from token object.
         """
         assert isinstance(kytea_tags_tuple, tuple)
@@ -84,6 +87,7 @@ class KyteaWrapper:
         return result
 
     def tokenize(self, sentence, normalize=True, is_feature=False, return_list=True):
+        # type: (Union[str,unicode], bool, bool, bool) -> Union[List[str], TokenizedSenetence]
         """This method returns tokenized result.
         If return_list==True(default), this method returns list whose element is tuple consisted with word_stem and POS.
         If return_list==False, this method returns TokenizedSenetence object.

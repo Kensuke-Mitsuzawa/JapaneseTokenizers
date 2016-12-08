@@ -1,5 +1,6 @@
 #! -*- coding: utf-8 -*-
 from MeCab import Node
+from typing import List
 from future.utils import string_types, text_type
 import sys
 __author__ = 'kensuke-mi'
@@ -33,6 +34,7 @@ class TokenizedResult(object):
 
 class TokenizedSenetence(object):
     def __init__(self, sentence, tokenized_objects):
+        # type: (str, List[TokenizedResult]) -> None
         assert isinstance(sentence, (str, string_types))
         assert isinstance(tokenized_objects, list)
 
