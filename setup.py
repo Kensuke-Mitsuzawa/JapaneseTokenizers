@@ -1,19 +1,24 @@
 #! -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 import sys
+import pip
 
 python_version = sys.version_info
 
 
 # check required libraries
+dev_extras = ['pyknp']
+dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz']
+
+# Try to install packages not controlled by pip
+for package_url in dependency_links: pip.main(['install', package_url])
+
 if python_version >= (3, 0, 0):
     install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv==0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
-    dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz#egg=pyknp-0.3']
 else:
     install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv==0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
-    dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz#egg=pyknp-0.3']
 
-version = '1.2'
+version = '1.2.2'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
@@ -35,6 +40,7 @@ classifiers = [
 
 setup(
     author='Kensuke Mitsuzawa',
+    author_email='kensuke.mit@gmail.com',
     name = name,
     version=version,
     short_description=short_description,
@@ -47,4 +53,7 @@ setup(
     install_requires = install_requires,
     dependency_links=dependency_links,
     packages=find_packages(),
+    extras_require=dict(
+        dev=dev_extras,
     )
+)
