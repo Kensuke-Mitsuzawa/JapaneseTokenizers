@@ -4,32 +4,33 @@ import os
 import logging
 import subprocess
 import MeCab
+from typing import List, Union, Any
 from JapaneseTokenizer.mecab_wrapper.text_preprocess import normalize_text
+from JapaneseTokenizer import init_logger
 from ..common.filter import filter_words
 from ..datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
 from future.utils import string_types
 __author__ = 'kensuke-mi'
 
-
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s %(levelname)s %(message)s")
+logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 python_version = sys.version_info
 
 
 class MecabWrapper:
 
     def __init__(self, dictType, pathUserDictCsv='', path_mecab_config='/usr/local/bin/', osType=''):
+        # type: (str, str, str, str)->None
         assert dictType in ["neologd", "all", "ipaddic", "user", ""]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
         self._path_mecab_config = path_mecab_config
         if osType != '':
-            logging.warn('osType argument is abolished. This argument might be unavailable in next version.')
+            logger.warn('osType argument is abolished. This argument might be unavailable in next version.')
 
         self._dictType = dictType
         self._pathUserDictCsv = pathUserDictCsv
         self._mecab_dictionary_path = self.__check_mecab_dict_path()
 
-        logging.info("mecab dictionary path is detected under {}".format(self._mecab_dictionary_path))
+        logger.info("mecab dictionary path is detected under {}".format(self._mecab_dictionary_path))
 
         self.mecabObj = self.__CallMecab()
 
@@ -43,7 +44,7 @@ class MecabWrapper:
         try:
             path_mecab_dict = subprocess.check_output( mecab_dic_cmd, shell=True  ).strip('\n')
         except subprocess.CalledProcessError:
-            logging.error("{}".format(mecab_dic_cmd))
+            logger.error("{}".format(mecab_dic_cmd))
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to execute mecab-config command")
         if path_mecab_dict == '':
             raise SystemError(
@@ -60,7 +61,7 @@ class MecabWrapper:
         try:
             path_mecab_libexe = subprocess.check_output( mecab_libexe_cmd, shell=True  ).strip('\n')
         except subprocess.CalledProcessError:
-            logging.error("{}".format(mecab_libexe_cmd))
+            logger.error("{}".format(mecab_libexe_cmd))
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to execute mecab-config --libexecdir")
         if path_mecab_libexe == '':
             raise SystemError('Mecab config is not callable with following command: {} You are not able to compile your user dictionary. Still, you are able to use default mecab dictionary.'.format(mecab_libexe_cmd))
@@ -72,37 +73,37 @@ class MecabWrapper:
         """
         """
         if self._dictType == 'neologd':
-            logging.debug('Use neologd additional dictionary')
+            logger.debug('Use neologd additional dictionary')
             cmMecabInitialize = '-d {}'.format(os.path.join(self._mecab_dictionary_path, "mecab-ipadic-neologd"))
 
         elif self._dictType == 'all':
-            logging.debug('Use neologd additional dictionary')
+            logger.debug('Use neologd additional dictionary')
             pathUserDict = self.__CompileUserdict()
             cmMecabInitialize = '-u {} -d {}'.format(pathUserDict,
                                                      os.path.join(self._mecab_dictionary_path, "mecab-ipadic-neologd"))
         elif self._dictType == 'ipadic':
-            logging.debug('Use ipadic additional dictionary')
+            logger.debug('Use ipadic additional dictionary')
             cmMecabInitialize = '-d {}'.format(os.path.join(self._mecab_dictionary_path, "ipadic"))
 
         elif self._dictType == 'user':
-            logging.debug('Use User dictionary')
+            logger.debug('Use User dictionary')
             pathUserDict = self.__CompileUserdict()
             cmMecabInitialize = '-u {}'.format(pathUserDict)
 
         else:
-            logging.debug('Use no default dictionary')
+            logger.debug('Use no default dictionary')
             cmMecabInitialize = ''
 
         cmMecabCall = "-Ochasen {}".format(cmMecabInitialize)
-        logging.debug(msg="mecab initialized with {}".format(cmMecabCall))
+        logger.debug(msg="mecab initialized with {}".format(cmMecabCall))
 
         try:
             mecabObj = MeCab.Tagger(cmMecabCall)
         except Exception as e:
-            logging.error(e.args)
-            logging.error(e.message)
-            logging.error(e.args)
-            logging.error("Possibly Path to userdict is invalid check the path")
+            logger.error(e.args)
+            logger.error(e.message)
+            logger.error(e.args)
+            logger.error("Possibly Path to userdict is invalid check the path")
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to initialize Mecab object")
 
         return mecabObj
@@ -118,13 +119,13 @@ class MecabWrapper:
                                                                                                             path_mecab_dict,
                                                                                                             self._pathUserDictCsv.replace("csv", "dict"),
                                                                                                             self._pathUserDictCsv)
-        logging.debug(msg="compiling mecab user dictionary with: {}".format(cmCompileDict))
+        logger.debug(msg="compiling mecab user dictionary with: {}".format(cmCompileDict))
         try:
             subprocess.call( cmCompileDict , shell=True )
         except OSError as e:
-            logging.error('type:' + str(type(e)))
-            logging.error('args:' + str(e.args))
-            logging.error('message:' + e.message)
+            logger.error('type:' + str(type(e)))
+            logger.error('args:' + str(e.args))
+            logger.error('message:' + e.message)
             sys.exit('Failed to compile mecab userdict. System ends')
 
         return self._pathUserDictCsv.replace("csv", "dict")
@@ -155,6 +156,7 @@ class MecabWrapper:
         return tuple_pos, word_stem
 
     def tokenize(self, sentence, is_feature=False, is_surface=False, return_list=True):
+        # type: (str, bool, bool, bool)->Union[List[str], TokenizedSenetence]
         """
         :param sentence:
         :param ins_mecab:
@@ -228,6 +230,7 @@ class MecabWrapper:
         ]
 
     def filter(self, parsed_sentence, pos_condition=None, stopwords=None):
+        # type: (TokenizedSenetence, List[Any], List[Any]) -> FilteredObject
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))

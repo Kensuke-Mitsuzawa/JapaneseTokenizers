@@ -3,8 +3,6 @@ import sys
 import logging
 __author__ = 'kensuke-mi'
 
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s %(levelname)s %(message)s")
 python_version = sys.version_info
 
 
