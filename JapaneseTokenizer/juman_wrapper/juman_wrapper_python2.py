@@ -2,23 +2,26 @@
 from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
+from JapaneseTokenizer import init_logger
+from typing import List, Union, Any
 from future.utils import string_types
 import logging
 import sys
+
+logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 __author__ = 'kensuke-mi'
 
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s %(levelname)s %(message)s")
 python_version = sys.version_info
 
 try:
     import pyknp
 except ImportError:
-    logging.error(msg='pyknp is not ready to use. Check your installing log.')
+    logger.error(msg='pyknp is not ready to use. Check your installing log.')
 
 
 class JumanWrapper:
     def __init__(self, command='juman', server=None, port=32000, timeout=30):
+        # type: (str, str, int, int)->None
         self.juman = pyknp.Juman(command=command, server=server, port=port, timeout=timeout)
 
     def __extract_morphological_information(self, mrph_object, is_feature, is_surface):
@@ -66,6 +69,7 @@ class JumanWrapper:
 
 
     def tokenize(self, sentence, normalize=True, is_feature=False, is_surface=False, return_list=True):
+        # type: (str, bool, bool, bool, bool)->Union[List[str], TokenizedSenetence]
         """This method returns tokenized result.
         If return_list==True(default), this method returns list whose element is tuple consisted with word_stem and POS.
         If return_list==False, this method returns TokenizedSenetence object.
