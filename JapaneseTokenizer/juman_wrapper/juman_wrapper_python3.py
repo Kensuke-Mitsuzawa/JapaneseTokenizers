@@ -1,19 +1,19 @@
 from JapaneseTokenizer.common import text_preprocess, filter
+from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from typing import List, Dict, Tuple, Union, TypeVar
 import logging
 import sys
 __author__ = 'kensuke-mi'
 
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s %(levelname)s %(message)s")
+logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 python_version = sys.version_info
 ContentsTypes = TypeVar('T')
 
 try:
     import pyknp
 except ImportError:
-    logging.error(msg='pyknp is not ready to use. Check your installing log.')
+    logger.error(msg='pyknp is not ready to use. Check your installing log.')
 
 
 class JumanWrapper:

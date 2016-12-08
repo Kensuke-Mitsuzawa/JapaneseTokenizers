@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
-import jctconv
+import jaconv
 import re
 import unicodedata
 __author__ = 'kensuke-mi'
@@ -22,7 +22,7 @@ def normalize_text_normal_ipadic(input_text):
     * All hankaku Katanaka is converted into Zenkaku Katakana
     * All hankaku English alphabet and numberc string are converted into Zenkaku one
     """
-    return jctconv.h2z(input_text, kana=True, ascii=True, digit=True)
+    return jaconv.h2z(input_text, kana=True, ascii=True, digit=True)
 
 
 def unicode_normalize(cls, s):

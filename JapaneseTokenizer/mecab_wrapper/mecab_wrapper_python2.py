@@ -5,7 +5,7 @@ import logging
 import subprocess
 import MeCab
 from typing import List, Union, Any
-from JapaneseTokenizer.mecab_wrapper.text_preprocess import normalize_text
+from JapaneseTokenizer.common.text_preprocess import normalize_text
 from JapaneseTokenizer import init_logger
 from ..common.filter import filter_words
 from ..datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
