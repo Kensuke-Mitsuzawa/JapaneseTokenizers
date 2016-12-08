@@ -2,17 +2,17 @@
 from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer.common import filter
+from JapaneseTokenizer import init_logger
 import logging
 import sys
 
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s %(levelname)s %(message)s")
+logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 python_version = sys.version_info
 
 try:
     import Mykytea
 except ImportError:
-    logging.error(msg='Mykytea is not ready to use yet. Install first')
+    logger.error(msg='Mykytea is not ready to use yet. Install first')
 
 __author__ = 'kensuke-mi'
 

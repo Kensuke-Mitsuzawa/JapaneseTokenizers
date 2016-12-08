@@ -1,5 +1,6 @@
 #! -*- coding: utf-8 -*-
 from MeCab import Node
+from typing import List, Union, Any, Tuple, Dict
 from future.utils import string_types, text_type
 import sys
 __author__ = 'kensuke-mi'
@@ -10,6 +11,7 @@ python_version = sys.version_info
 class TokenizedResult(object):
     def __init__(self, node_obj, tuple_pos, word_stem, word_surface,
                  is_feature=True, is_surface=False, misc_info=None, analyzed_line=None):
+        # type: (Union[Node, None], Union[str, Tuple[Any], str, str, bool, bool, Union[None, Dict[str, Any]], str])->None
         assert isinstance(node_obj, (Node, type(None)))
         assert isinstance(tuple_pos, (str, string_types, tuple))
         assert isinstance(word_stem, (str, string_types))
@@ -31,8 +33,10 @@ class TokenizedResult(object):
         else:
             raise Exception('Error while parsing feature object. {}'.format(self.tuple_pos))
 
+
 class TokenizedSenetence(object):
     def __init__(self, sentence, tokenized_objects):
+        # type: (str, List[TokenizedResult]) -> None
         assert isinstance(sentence, (str, string_types))
         assert isinstance(tokenized_objects, list)
 
@@ -58,6 +62,7 @@ class TokenizedSenetence(object):
         return token
 
     def convert_list_object(self):
+        # type: () -> List[Union[str, Tuple[str,str]]]
         sentence_in_list_obj = [
             self.__extend_token_object(token_object)
             for token_object

@@ -9,3 +9,4 @@ pyknp.egg-info/
 morphogySplitters/
 Mykytea-python/
 .DS_Store
+*tox
