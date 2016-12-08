@@ -8,13 +8,10 @@ python_version = sys.version_info
 # check required libraries
 if python_version >= (3, 0, 0):
     install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv==0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
-    dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz#egg=pyknp-0.3',
-                        'https://github.com/chezou/Mykytea-python/zipball/master#egg=kytea'
-                        ]
+    dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz#egg=pyknp-0.3']
 else:
     install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv==0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
-    dependency_links = ['https://github.com/chezou/Mykytea-python/zipball/master#egg=kytea',
-                        'http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz#egg=pyknp-0.3']
+    dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz#egg=pyknp-0.3']
 
 version = '1.2'
 name = 'JapaneseTokenizer'
