@@ -14,11 +14,11 @@ dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http
 for package_url in dependency_links: pip.main(['install', package_url])
 
 if python_version >= (3, 0, 0):
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv==0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv>=0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
 else:
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv==0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
 
-version = '1.2.3'
+version = '1.2.4'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 

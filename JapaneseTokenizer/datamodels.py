@@ -73,6 +73,7 @@ class TokenizedSenetence(object):
 
 class FilteredObject(TokenizedSenetence):
     def __init__(self, sentence, tokenized_objects, pos_condition, stopwords):
+        # type: (str, TokenizedResult, List[Any], List[str]) -> None
         super(FilteredObject, self).__init__(
             sentence=sentence,
             tokenized_objects=tokenized_objects
