@@ -4,6 +4,10 @@ from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, Tokeni
 from typing import List, Dict, Tuple, Union, TypeVar
 import logging
 import sys
+import socket
+import six
+import os
+import re
 __author__ = 'kensuke-mi'
 
 logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
@@ -16,10 +20,72 @@ except ImportError:
     logger.error(msg='pyknp is not ready to use. Check your installing log.')
 
 
+class MonkeyPatchSocket(object):
+    """* Class for overwriting pyknp.Socket because it is only for python2.x"""
+    def __init__(self, hostname, port, option=None):
+        try:
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.connect((hostname, port))
+        except:
+            raise
+        if option is not None:
+            self.sock.send(option)
+        data = b""
+        while b"OK" not in data:
+            #while isinstance(data, bytes) and b"OK" not in data:
+            data = self.sock.recv(1024)
+
+    def __del__(self):
+        if self.sock:
+            self.sock.close()
+
+    def query(self, sentence, pattern):
+        assert(isinstance(sentence, six.text_type))
+        self.sock.sendall(b"%s\n" % sentence.encode('utf-8').strip())
+        data = self.sock.recv(1024)
+        assert isinstance(data, bytes)
+        recv = data
+        while not re.search(pattern, recv):
+            data = self.sock.recv(1024)
+            recv = b"%s%s" % (recv, data)
+        return recv.strip().decode('utf-8')
+
+
 class JumanWrapper:
-    def __init__(self, command:str='juman', server:Union[str,None]=None, port:int=32000, timeout:int=30):
-        self.juman = pyknp.Juman(command=command, server=server, port=port, timeout=timeout)
+    def __init__(self, command:str='juman', server:Union[str,None]=None,
+                 port:int=32000,
+                 timeout:int=30,
+                 rcfile:str=None,
+                 option:bytes=b'-e2 -B',
+                 pattern:bytes=b'EOS',
+                 **args):
+        """* Class to call Juman tokenizer
+        """
+        if not rcfile is None and not os.path.exists(rcfile): raise FileExistsError('rcfile does not exist at {}'.format(rcfile))
+
+        self.juman = pyknp.Juman(command=command, server=server, port=port,
+                                 timeout=timeout, rcfile=rcfile, option=option,
+                                 pattern=pattern, **args)
+        ### It overwrites juman_lines() method ###
+        self.juman.juman_lines = self.__monkey_patch_juman_lines
         self.timeout = timeout
+
+    def __monkey_patch_juman_lines(self, input_str:str):
+        """* What you can do
+        - It overwrites juman_line() method because this method causes TypeError in python3
+        """
+        if not self.juman.socket and not self.juman.subprocess:
+            if self.juman.server is not None:
+                self.juman.socket = MonkeyPatchSocket(self.juman.server, self.juman.port, b"RUN -e2\n")
+            else:
+                command = "%s %s" % (self.juman.command, self.juman.option)
+                if self.juman.rcfile:
+                    command += " -r %s" % self.juman.rcfile
+                self.subprocess = pyknp.Subprocess(command)
+        if self.juman.socket:
+            return self.juman.socket.query(input_str, pattern=self.juman.pattern)
+        return self.juman.subprocess.query(input_str, pattern=self.juman.pattern)
+
 
     def __extract_morphological_information(self, mrph_object:pyknp.Morpheme, is_feature:bool, is_surface:bool)->TokenizedResult:
         """This method extracts morphlogical information from token object.
@@ -106,8 +172,7 @@ class JumanWrapper:
         if return_list:
             tokenized_objects = TokenizedSenetence(
                 sentence=sentence,
-                tokenized_objects=token_objects
-            )
+                tokenized_objects=token_objects)
             return tokenized_objects.convert_list_object()
         else:
             tokenized_objects = TokenizedSenetence(
