@@ -24,7 +24,7 @@ class TestMecabWrapperPython2(unittest.TestCase):
 
     def test_default_parse(self):
         mecab_obj = self.test_init_mecab_wrapper()
-        parsed_obj = mecab_obj.tokenize(sentence=self.test_senetence)
+        parsed_obj = mecab_obj.tokenize(sentence=self.test_senetence, return_list=True)
         assert isinstance(parsed_obj, list)
         if python_version >= (3, 0, 0):
             for morph in parsed_obj: assert isinstance(morph, str)
@@ -40,12 +40,10 @@ class TestMecabWrapperPython2(unittest.TestCase):
         mecab_obj = MecabWrapper(dictType=dictType, pathUserDictCsv=self.path_user_dict, osType=osType)
         assert isinstance(mecab_obj, MecabWrapper)
 
-        res = mecab_obj.tokenize(sentence=self.test_senetence)
+        res = mecab_obj.tokenize(sentence=self.test_senetence, return_list=True)
         assert isinstance(res, list)
         assert u'さくらまな' in res
 
 
-def suite():
+if __name__ == '__main__':
     unittest.main()
-
-

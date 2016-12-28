@@ -85,7 +85,7 @@ class KyteaWrapper(WrapperBase):
                  normalize=True,
                  is_feature=False,
                  is_surface=False,
-                 return_list=True,
+                 return_list=False,
                  func_normalizer=text_preprocess.normalize_text):
         """This method returns tokenized result.
         If return_list==True(default), this method returns list whose element is tuple consisted with word_stem and POS.

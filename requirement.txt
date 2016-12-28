@@ -1,4 +1,4 @@
 six
-http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/knp/pyknp-0.22.tar.gz&name=pyknp-0.22.tar.gz#egg=pyknp-0.22
 git+https://github.com/chezou/Mykytea-python
 pypandoc
+bin/pyknp-0.3.tar.gz

@@ -1,8 +1,8 @@
 #! -*- coding: utf-8 -*-
-from ..datamodels import TokenizedSenetence, TokenizedResult, FilteredObject
 __author__ = 'kensuke-mi'
+from JapaneseTokenizer.datamodels import TokenizedSenetence, TokenizedResult, FilteredObject
 
-
+'''
 def __is_sotpwords(token, stopwords):
     """This function filters out stopwords. If token is in stopwords list, return True; else return False
     :param token:
@@ -35,7 +35,7 @@ def __is_valid_pos(pos_tuple, valid_pos):
 
 
 def filter_words(tokenized_obj, valid_pos, stopwords):
-    # type: (TokenizedSenetence, List[Any], List[str]) -> FilteredObject
+    # type: (TokenizedSenetence, List[Tuple[str,...]], List[str]) -> FilteredObject
     """This function filter token that user don't want to take.
     Condition is stopword and pos.
 
@@ -75,4 +75,4 @@ def filter_words(tokenized_obj, valid_pos, stopwords):
         stopwords=stopwords
     )
 
-    return filtered_object
+    return filtered_object'''

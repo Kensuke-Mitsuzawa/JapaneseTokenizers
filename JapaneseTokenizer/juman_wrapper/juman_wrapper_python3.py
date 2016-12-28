@@ -106,7 +106,7 @@ class JumanWrapper(WrapperBase):
                  normalize=True,
                  is_feature=False,
                  is_surface=False,
-                 return_list=True,
+                 return_list=False,
                  func_normalizer=text_preprocess.normalize_text):
         # type: (str, bool, bool, bool, bool, Callable[[str], str]) -> Union[TokenizedSenetence, List[str]]
         """

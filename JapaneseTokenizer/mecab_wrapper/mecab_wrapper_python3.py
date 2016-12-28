@@ -6,9 +6,9 @@ import MeCab
 import logging
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.common.text_preprocess import normalize_text
-from ..common.filter import filter_words
-from ..datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
-from typing import List, Dict, Tuple, Union, TypeVar
+from JapaneseTokenizer.object_models import WrapperBase
+from JapaneseTokenizer.datamodels import TokenizedSenetence, TokenizedResult, FilteredObject
+from typing import List, Dict, Tuple, Union, TypeVar, Callable
 ContentsTypes = TypeVar('T')
 __author__ = 'kensuke-mi'
 
@@ -18,9 +18,8 @@ logging.basicConfig(level=logging.DEBUG,
 python_version = sys.version_info
 
 
-class MecabWrapper:
-
-    def __init__(self, dictType:str, pathUserDictCsv:str='', path_mecab_config:str='/usr/local/bin/', osType:str=''):
+class MecabWrapper(WrapperBase):
+    def __init__(self, dictType:str, pathUserDictCsv:str=None, path_mecab_config:str='/usr/local/bin/', osType:str=''):
         assert dictType in ["neologd", "all", "ipaddic", "user", ""]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
         self._path_mecab_config = path_mecab_config
@@ -202,18 +201,26 @@ class MecabWrapper:
         return tokenized_obj
 
     def tokenize(self, sentence:str,
-                 is_feature:bool=False, is_surface:bool=False, return_list:bool=True)->Union[TokenizedSenetence, List[ContentsTypes]]:
-        """
-        :param sentence:
-        :param ins_mecab:
-        :param list_stopword:
-        :param list_pos_candidate:
-        :return:  list [tuple (unicode, unicode)]
+                 normalize:bool=True,
+                 is_feature:bool=False,
+                 is_surface:bool=False,
+                 return_list:bool=False,
+                 func_normalizer:Callable[[str], str]=None
+                 )->Union[TokenizedSenetence, List[ContentsTypes]]:
+        """* What you can do
+        -
         """
         assert isinstance(sentence, str)
+        ### decide normalization function depending on dictType
+        if func_normalizer is None and self._dictType == 'neologd':
+            normalized_sentence = normalize_text(sentence, dictionary_mode='neologd')
+            normalized_sentence = normalized_sentence.replace('　', '')
+        elif func_normalizer is None:
+            normalized_sentence = normalize_text(sentence)
+            normalized_sentence = normalized_sentence.replace('　', '')
+        else:
+            normalized_sentence = func_normalizer(sentence)
 
-        normalized_sentence = normalize_text(sentence, dictionary_mode=self._dictType)
-        normalized_sentence = normalized_sentence.replace('　', '')
         # don't delete this variable. encoded_text protects sentence from deleting
         encoded_text = normalized_sentence
 
@@ -233,44 +240,9 @@ class MecabWrapper:
         else:
             return tokenized_sentence
 
-    def convert_str(self, p_c_tuple):
-        converted = []
-        for item in p_c_tuple:
-            if isinstance(item, str): converted.append(item)
-            else: converted.append(item)
-        return converted
-
-    def __check_pos_condition_str(self, pos_condistion):
-        assert isinstance(pos_condistion, list)
-        # [ ('', '', '') ]
-
-        return [
-            tuple(self.convert_str(p_c_tuple))
-            for p_c_tuple
-            in pos_condistion
-        ]
-
-    def filter(self, parsed_sentence:TokenizedSenetence, pos_condition:bool=None, stopwords:bool=None)->FilteredObject:
+    def filter(self, parsed_sentence:TokenizedSenetence, pos_condition:List[Tuple[str,...]]=None, stopwords:List[str]=None)->FilteredObject:
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
-        if isinstance(stopwords, type(None)):
-            s_words = []
-        else:
-            s_words = stopwords
-
-        if isinstance(pos_condition, type(None)):
-            p_condition = []
-        else:
-            p_condition = self.__check_pos_condition_str(pos_condition)
-
-        filtered_object = filter_words(
-            tokenized_obj=parsed_sentence,
-            valid_pos=p_condition,
-            stopwords=s_words
-        )
-        assert isinstance(filtered_object, FilteredObject)
-
-        return filtered_object
-
+        return parsed_sentence.filter(pos_condition, stopwords)

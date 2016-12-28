@@ -27,21 +27,32 @@ If you find any bugs, please report them to github issues. Or any pull requests 
 
 ### Mecab
 
-[Mecab](http://mecab.googlecode.com/svn/trunk/mecab/doc/index.html?sess=3f6a4f9896295ef2480fa2482de521f6) is open source tokenization system for various language(if you have dictionary for it)
+[Mecab](http://mecab.googlecode.com/svn/trunk/mecab/doc/index.html?sess=3f6a4f9896295ef2480fa2482de521f6) is open source tokenizer system for various language(if you have dictionary for it)
 
 See [english documentation](https://github.com/jordwest/mecab-docs-en) for detail
 
 ### Juman
 
-[Juman](http://nlp.ist.i.kyoto-u.ac.jp/EN/index.php?JUMAN) is tokenization tool developped by Kurohashi laboratory, Kyoto University, Japan.
+[Juman](http://nlp.ist.i.kyoto-u.ac.jp/EN/index.php?JUMAN) is tokenizer tool developped by Kurohashi laboratory, Kyoto University, Japan.
 
 Juman is strong for ambigious writing style in Japanese, and is strong for new-comming words thanks to Web based huge dictionary.
  
 And, Juman tells you semantic meaning of words.
 
+### Juman++
+
+[Juman++](http://nlp.ist.i.kyoto-u.ac.jp/EN/index.php?JUMAN++) is tokenizer  developped by Kurohashi laboratory, Kyoto University, Japan.
+
+Juman++ is succeeding system of Juman. It adopts RNN model for tokenization.
+
+Juman++ is strong for ambigious writing style in Japanese, and is strong for new-comming words thanks to Web based huge dictionary.
+ 
+And, Juman tells you semantic meaning of words.
+
+
 ### Kytea
 
-[Kytea](http://www.phontron.com/kytea/) is tokenization tool developped by Graham Neubig.
+[Kytea](http://www.phontron.com/kytea/) is tokenizer tool developped by Graham Neubig.
 
 Kytea has a different algorithm from one of Mecab or Juman. 
 
@@ -71,6 +82,19 @@ See [here](https://github.com/neologd/mecab-ipadic-neologd) and install mecab-ne
     ./configure
     make   
     [sudo] make install
+    
+## Juman++
+
+* GCC version must be >= 5
+
+```
+wget http://lotus.kuee.kyoto-u.ac.jp/nl-resource/jumanpp/jumanpp-1.01.tar.xz
+tar xJvf jumanpp-1.01.tar.xz
+cd jumanpp-1.01/
+./configure
+make
+[sudo] make install
+```
     
 ## Kytea
 
@@ -186,3 +210,9 @@ natto-py is sophisticated package for tokenization. It supports following featur
 ## 1.0 (2016-06-19)
 
 * Juman supports also for Python3.x
+
+## 1.2.5 (2016-12-28)
+
+* It fixed bugs in Juman server mode in python3.x
+* It supports Juman++
+* It supports `filter` method with chain expression

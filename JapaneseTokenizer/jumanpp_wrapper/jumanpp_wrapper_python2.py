@@ -5,6 +5,7 @@ from JapaneseTokenizer.common import text_preprocess, juman_utils
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
 from typing import List, Dict, Tuple, Union, TypeVar
+from future.utils import string_types, text_type
 import logging
 import sys
 import socket
@@ -24,44 +25,39 @@ except ImportError:
 
 class JumanppClient(object):
     """Class for receiving data as client"""
-    def __init__(self, hostname:str, port:int, timeout:int=50, option=None):
+    def __init__(self, hostname, port, timeout=50, option=None):
+        # type: (str, int, int, Dict[string_types,Any])->None
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((hostname, port))
-        except ConnectionRefusedError:
-            raise Exception("There is no jumanpp server hostname={}, port={}".format(hostname, port))
         except:
-            raise
+            raise Exception("There is no jumanpp server hostname={}, port={}".format(hostname, port))
         if option is not None:
             self.sock.send(option)
-        data = b""
+        data = ''
         self.sock.settimeout(timeout)
 
     def __del__(self):
-        if self.sock:
-            self.sock.close()
+        if self.sock: self.sock.close()
 
     def query(self, sentence, pattern):
-        # type: (, str, bytes) -> str
+        # type: (unicode, bytes) -> unicode
         assert (isinstance(sentence, six.text_type))
-        self.sock.sendall(b"%s\n" % sentence.encode('utf-8').strip())
+        data = ''
+        self.sock.sendall("%s\n" % sentence.encode('utf-8').strip())
         data = self.sock.recv(1024)
         assert isinstance(data, bytes)
         recv = data
         while not re.search(pattern, recv):
             data = self.sock.recv(1024)
-            recv = b"%s%s" % (recv, data)
+            recv = "%s%s" % (recv, data)
         return recv.strip().decode('utf-8')
 
 
 class JumanppWrapper(WrapperBase):
     """Class for Juman++"""
-    def __init__(self, command='jumanpp', timeout=30, pattern=r'EOS', server:str=None, port:int=12000, **args):
-        # type: (str, int, str, str) -> None
-        if not server is None:
-            pattern = pattern.encode('utf-8')
-
-
+    def __init__(self, command='jumanpp', timeout=30, pattern='EOS', server=None, port=12000, **args):
+        # type: (str, int, str, str, int, Dict[str,Any]) -> None
         self.eos_pattern = pattern
         if server is None:
             self.jumanpp_obj = Jumanpp(
@@ -73,12 +69,10 @@ class JumanppWrapper(WrapperBase):
             self.jumanpp_obj = JumanppClient(hostname=server, port=port, timeout=timeout)
 
     def __del__(self):
-        if isinstance(self.jumanpp_obj, JumanppClient):
-            self.jumanpp_obj.sock.close()
         del self.jumanpp_obj
 
     def call_juman_interface(self, input_str):
-        # type: (str) -> MList
+        # type: (unicode) -> MList
         """* What you can do
         - You call Juman tokenizer interface.
 
@@ -101,7 +95,7 @@ class JumanppWrapper(WrapperBase):
                  is_surface=False,
                  return_list=False,
                  func_normalizer=text_preprocess.normalize_text):
-        # type: (str, bool, bool, bool, bool, Callable[[str], str]) -> Union[TokenizedSenetence, List[str]]
+        # type: (unicode, bool, bool, bool, bool, Callable[[unicode], unicode]) -> Union[TokenizedSenetence, List[unicode]]
         """* What you can do
         -
         """
@@ -131,7 +125,8 @@ class JumanppWrapper(WrapperBase):
                 tokenized_objects=token_objects)
             return tokenized_objects
 
-    def filter(self, parsed_sentence: TokenizedSenetence, pos_condition:List[Tuple[str,...]]=None, stopwords:List[str]=None) -> FilteredObject:
+    def filter(self, parsed_sentence, pos_condition=None, stopwords=None):
+        # type: (TokenizedSenetence, List[Tuple[unicode,...]], List[unicode]) -> FilteredObject
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
