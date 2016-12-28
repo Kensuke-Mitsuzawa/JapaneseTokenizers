@@ -1,6 +1,7 @@
 from JapaneseTokenizer.datamodels import TokenizedResult, TokenizedSenetence
 from typing import Tuple
 import pyknp
+from future.utils import string_types, text_type
 
 """These functions are for utilization of Juman"""
 
@@ -38,8 +39,8 @@ def extract_morphological_information(mrph_object, is_feature, is_surface):
     return token_object
 
 
-def feature_parser(uni_feature: str, word_surface: str):
-    # type: (str, str) -> Tuple[Tuple[str, str, str,], str]
+def feature_parser(uni_feature, word_surface):
+    # type: (string_types, string_types) -> Tuple[Tuple[string_types, string_types, string_types], string_types]
     """
     Parse the POS feature output by Mecab
     :param uni_feature unicode:
