@@ -9,7 +9,6 @@ import logging
 import sys
 import socket
 import six
-import os
 import re
 __author__ = 'kensuke-mi'
 
@@ -41,6 +40,7 @@ class JumanppClient(object):
         if self.sock: self.sock.close()
 
     def query(self, sentence, pattern):
+        # type: (, str, bytes) -> str
         assert (isinstance(sentence, six.text_type))
         self.sock.sendall(b"%s\n" % sentence.encode('utf-8').strip())
         data = self.sock.recv(1024)
@@ -70,8 +70,26 @@ class JumanppWrapper(WrapperBase):
         else:
             self.jumanpp_obj = JumanppClient(hostname=server, port=port)
 
+    def call_juman_interface(self, input_str):
+        # type: (str) -> MList
+        """* What you can do
+        - You call Juman tokenizer interface.
+
+        * Output
+        - pyknp.MList
+        """
+        if isinstance(self.jumanpp_obj, Jumanpp):
+            ml_token_object = self.jumanpp_obj.analysis(input_str=input_str)
+        elif isinstance(self.jumanpp_obj, JumanppClient):
+            server_response = self.jumanpp_obj.query(sentence=input_str, pattern=self.eos_pattern)
+            ml_token_object = MList(server_response)
+        else:
+            raise Exception('Not defined')
+
+        return ml_token_object
+
     def tokenize(self, sentence, normalize=True, is_feature=False, is_surface=False, return_list=True):
-        # type: (str, bool, bool, bool, bool)
+        # type: (str, bool, bool, bool, bool) -> Union[TokenizedSenetence, List[str]]
         """* What you can do
         -
         """
@@ -80,13 +98,7 @@ class JumanppWrapper(WrapperBase):
         else:
             normalized_sentence = sentence
 
-        if isinstance(self.jumanpp_obj, Jumanpp):
-            ml_token_object = self.jumanpp_obj.analysis(input_str=normalized_sentence)
-        elif isinstance(self.jumanpp_obj, JumanppClient):
-            server_response = self.jumanpp_obj.query(sentence=normalized_sentence, pattern=self.eos_pattern)
-            ml_token_object = MList(server_response)
-        else:
-            raise Exception('Not defined')
+        ml_token_object = self.call_juman_interface(normalized_sentence)
 
         token_objects = [
             juman_utils.extract_morphological_information(
@@ -107,45 +119,9 @@ class JumanppWrapper(WrapperBase):
                 tokenized_objects=token_objects)
             return tokenized_objects
 
-    def convert_str(self, p_c_tuple):
-        converted = []
-        for item in p_c_tuple:
-            if isinstance(item, str):
-                converted.append(item)
-            else:
-                converted.append(item)
-        return converted
-
-    def __check_pos_condition_str(self, pos_condistion):
-        assert isinstance(pos_condistion, list)
-        # [ ('', '', '') ]
-
-        return [
-            tuple(self.convert_str(p_c_tuple))
-            for p_c_tuple
-            in pos_condistion
-            ]
-
     def filter(self, parsed_sentence: TokenizedSenetence, pos_condition=None, stopwords=None) -> FilteredObject:
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
-        if isinstance(stopwords, type(None)):
-            s_words = []
-        else:
-            s_words = stopwords
-
-        if isinstance(pos_condition, type(None)):
-            p_condition = []
-        else:
-            p_condition = self.__check_pos_condition_str(pos_condition)
-
-        filtered_object = filter.filter_words(
-            tokenized_obj=parsed_sentence,
-            valid_pos=p_condition,
-            stopwords=s_words
-        )
-        assert isinstance(filtered_object, FilteredObject)
-
-        return filtered_object
+        return  parsed_sentence.filter(pos_condition, stopwords)

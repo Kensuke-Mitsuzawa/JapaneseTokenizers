@@ -35,12 +35,18 @@ def __is_valid_pos(pos_tuple, valid_pos):
 
 
 def filter_words(tokenized_obj, valid_pos, stopwords):
+    # type: (TokenizedSenetence, List[Any], List[str]) -> FilteredObject
     """This function filter token that user don't want to take.
     Condition is stopword and pos.
-    :param tokenized_obj:
-    :param valid_pos:
-    :param stopwords:
-    :return:
+
+    * Input
+    - valid_pos
+        - List of Tuple which has POS element to keep.
+        - Keep in your mind, each tokenizer has different POS structure.
+         >>> [('名詞', '固有名詞'), ('動詞', )]
+    - stopwords
+        - List of str, which you'd like to remove
+        >>> ['残念', '今日']
     """
     assert isinstance(tokenized_obj, TokenizedSenetence)
     assert isinstance(valid_pos, list)
