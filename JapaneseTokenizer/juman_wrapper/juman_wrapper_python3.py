@@ -1,7 +1,8 @@
-from JapaneseTokenizer.common import text_preprocess, filter, juman_utils
+from JapaneseTokenizer.object_models import WrapperBase
+from JapaneseTokenizer.common import text_preprocess, juman_utils
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
-from typing import List, Union, TypeVar
+from typing import List, Union, TypeVar, Tuple
 import logging
 import sys
 import socket
@@ -51,7 +52,7 @@ class MonkeyPatchSocket(object):
         return recv.strip().decode('utf-8')
 
 
-class JumanWrapper:
+class JumanWrapper(WrapperBase):
     def __init__(self, command:str='juman', server:Union[str,None]=None,
                  port:int=32000,
                  timeout:int=30,
@@ -90,6 +91,17 @@ class JumanWrapper:
             return self.juman.socket.query(input_str, pattern=self.juman.pattern)
         return self.juman.subprocess.query(input_str, pattern=self.juman.pattern)
 
+    def call_juman_interface(self, input_str):
+        # type: (str) -> MList
+        """* What you can do
+        - You call Juman tokenizer interface.
+
+        * Output
+        - pyknp.MList
+        """
+        return self.juman.analysis(input_str)
+
+
     def tokenize(self, sentence:str, normalize:bool=True,
                  is_feature:bool=False,
                  is_surface:bool=False,
@@ -108,7 +120,7 @@ class JumanWrapper:
         else:
             normalized_sentence = sentence
 
-        result = self.juman.analysis(normalized_sentence)
+        result = self.call_juman_interface(normalized_sentence)
         token_objects = [
             juman_utils.extract_morphological_information(
                 mrph_object=morph_object,
@@ -129,43 +141,9 @@ class JumanWrapper:
 
             return tokenized_objects
 
-    def convert_str(self, p_c_tuple):
-        converted = []
-        for item in p_c_tuple:
-            if isinstance(item, str): converted.append(item)
-            else: converted.append(item)
-        return converted
-
-    def __check_pos_condition_str(self, pos_condistion):
-        assert isinstance(pos_condistion, list)
-        # [ ('', '', '') ]
-
-        return [
-            tuple(self.convert_str(p_c_tuple))
-            for p_c_tuple
-            in pos_condistion
-        ]
-
-    def filter(self, parsed_sentence:TokenizedSenetence, pos_condition=None, stopwords=None)->FilteredObject:
+    def filter(self, parsed_sentence:TokenizedSenetence, pos_condition:List[Tuple[str, ...]]=None, stopwords:List[str]=None)->FilteredObject:
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
-        if isinstance(stopwords, type(None)):
-            s_words = []
-        else:
-            s_words = stopwords
-
-        if isinstance(pos_condition, type(None)):
-            p_condition = []
-        else:
-            p_condition = self.__check_pos_condition_str(pos_condition)
-
-        filtered_object = filter.filter_words(
-            tokenized_obj=parsed_sentence,
-            valid_pos=p_condition,
-            stopwords=s_words
-        )
-        assert isinstance(filtered_object, FilteredObject)
-
-        return filtered_object
+        return parsed_sentence.filter(pos_condition, stopwords)
