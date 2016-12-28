@@ -1,5 +1,13 @@
+from typing import Callable
+
 class WrapperBase(object):
-    def tokenize(self, sentence, normalize=True, is_feature=False, is_surface=False, return_list=True):
+    def tokenize(self, sentence,
+                 normalize,
+                 is_feature,
+                 is_surface,
+                 return_list,
+                 func_normalizer=None):
+        # type: (, str, bool, bool, bool, bool, Callable[[str], str])
         """* What you can do"""
         raise NotImplemented
 
