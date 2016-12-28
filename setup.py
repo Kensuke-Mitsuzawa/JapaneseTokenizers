@@ -18,7 +18,7 @@ if python_version >= (3, 0, 0):
 else:
     install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
 
-version = '1.2.4'
+version = '1.2.5'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
