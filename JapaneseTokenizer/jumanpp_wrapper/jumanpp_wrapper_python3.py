@@ -1,7 +1,7 @@
 from pyknp import Jumanpp
 from pyknp import MList
 from JapaneseTokenizer.object_models import WrapperBase
-from JapaneseTokenizer.common import text_preprocess, filter, juman_utils
+from JapaneseTokenizer.common import text_preprocess, juman_utils
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
 from typing import List, Dict, Tuple, Union, TypeVar
@@ -88,13 +88,18 @@ class JumanppWrapper(WrapperBase):
 
         return ml_token_object
 
-    def tokenize(self, sentence, normalize=True, is_feature=False, is_surface=False, return_list=True):
-        # type: (str, bool, bool, bool, bool) -> Union[TokenizedSenetence, List[str]]
+    def tokenize(self, sentence,
+                 normalize=True,
+                 is_feature=False,
+                 is_surface=False,
+                 return_list=True,
+                 func_normalizer=text_preprocess.normalize_text):
+        # type: (str, bool, bool, bool, bool, Callable[[str], str]) -> Union[TokenizedSenetence, List[str]]
         """* What you can do
         -
         """
         if normalize:
-            normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
+            normalized_sentence = func_normalizer(sentence)
         else:
             normalized_sentence = sentence
 

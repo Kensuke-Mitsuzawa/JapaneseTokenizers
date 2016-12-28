@@ -102,10 +102,13 @@ class JumanWrapper(WrapperBase):
         return self.juman.analysis(input_str)
 
 
-    def tokenize(self, sentence:str, normalize:bool=True,
-                 is_feature:bool=False,
-                 is_surface:bool=False,
-                 return_list:bool=True)->Union[List[ContentsTypes], TokenizedSenetence]:
+    def tokenize(self, sentence,
+                 normalize=True,
+                 is_feature=False,
+                 is_surface=False,
+                 return_list=True,
+                 func_normalizer=text_preprocess.normalize_text):
+        # type: (str, bool, bool, bool, bool, Callable[[str], str]) -> Union[TokenizedSenetence, List[str]]
         """
         :param sentence:
         :param ins_mecab:
@@ -116,7 +119,7 @@ class JumanWrapper(WrapperBase):
         assert isinstance(normalize, bool)
         assert isinstance(sentence, str)
         if normalize:
-            normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
+            normalized_sentence = func_normalizer(sentence)
         else:
             normalized_sentence = sentence
 
