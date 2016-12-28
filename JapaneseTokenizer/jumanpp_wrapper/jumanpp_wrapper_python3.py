@@ -119,7 +119,7 @@ class JumanppWrapper(WrapperBase):
                 tokenized_objects=token_objects)
             return tokenized_objects
 
-    def filter(self, parsed_sentence: TokenizedSenetence, pos_condition=None, stopwords=None) -> FilteredObject:
+    def filter(self, parsed_sentence: TokenizedSenetence, pos_condition:List[Tuple[str,...]]=None, stopwords:List[str]=None) -> FilteredObject:
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))

@@ -12,7 +12,7 @@ python_version = sys.version_info
 class TokenizedResult(object):
     def __init__(self, node_obj, tuple_pos, word_stem, word_surface,
                  is_feature=True, is_surface=False, misc_info=None, analyzed_line=None):
-        # type: (Union[Node, None], Union[str, Tuple[...], str, str, bool, bool, Union[None, Dict[str, Any]], str])->None
+        # type: (Union[Node, None], Union[str, Tuple[str, ...], str, str, bool, bool, Union[None, Dict[str, Any]], str])->None
         assert isinstance(node_obj, (Node, type(None)))
         assert isinstance(tuple_pos, (str, string_types, tuple))
         assert isinstance(word_stem, (str, string_types))
@@ -73,7 +73,7 @@ class TokenizedSenetence(object):
         return sentence_in_list_obj
 
     def __convert_str(self, p_c_tuple):
-        # type: (Tuple[...]) -> List[str]
+        # type: (Tuple[str, ...]) -> List[str]
         converted = []
         for item in p_c_tuple:
             if isinstance(item, str):
@@ -83,7 +83,7 @@ class TokenizedSenetence(object):
         return converted
 
     def __check_pos_condition_str(self, pos_condistion):
-        # type: (List[Tuple[...]]) -> List[Tuple[...]]
+        # type: (List[Tuple[str, ...]]) -> List[Tuple[str, ...]]
         """* What you can do
         - Check your pos condition is correct or NOT
 
@@ -102,7 +102,7 @@ class TokenizedSenetence(object):
             in pos_condistion]
 
     def filter(self, pos_condition=None, stopwords=None):
-        # type: (List[Any], List[str]) ->  FilteredObject
+        # type: (List[Tuple[str,...]], List[str]) ->  FilteredObject
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
@@ -128,7 +128,7 @@ class TokenizedSenetence(object):
 
 class FilteredObject(TokenizedSenetence):
     def __init__(self, sentence, tokenized_objects, pos_condition, stopwords):
-        # type: (str, List[TokenizedResult], List[...], List[str]) -> None
+        # type: (str, List[TokenizedResult], List[str, ...], List[str]) -> None
         super(FilteredObject, self).__init__(
             sentence=sentence,
             tokenized_objects=tokenized_objects
