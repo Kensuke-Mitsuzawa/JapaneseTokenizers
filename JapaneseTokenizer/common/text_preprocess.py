@@ -9,7 +9,7 @@ import unicodedata
 __author__ = 'kensuke-mi'
 
 
-def normalize_text(input_text, dictionary_mode):
+def normalize_text(input_text, dictionary_mode='ipadic'):
     if dictionary_mode=='neologd':
         # this code comes from https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja
         return normalize_neologd(input_text)

@@ -1,13 +1,14 @@
+from pyknp import Jumanpp
+from pyknp import MList
 from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common import text_preprocess, juman_utils
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
-from typing import List, Union, TypeVar, Tuple
+from typing import List, Dict, Tuple, Union, TypeVar
 import logging
 import sys
 import socket
 import six
-import os
 import re
 __author__ = 'kensuke-mi'
 
@@ -21,27 +22,28 @@ except ImportError:
     logger.error(msg='pyknp is not ready to use. Check your installing log.')
 
 
-class MonkeyPatchSocket(object):
-    """* Class for overwriting pyknp.Socket because it is only for python2.x"""
-    def __init__(self, hostname, port, option=None):
+class JumanppClient(object):
+    """Class for receiving data as client"""
+    def __init__(self, hostname:str, port:int, timeout:int=50, option=None):
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((hostname, port))
+        except ConnectionRefusedError:
+            raise Exception("There is no jumanpp server hostname={}, port={}".format(hostname, port))
         except:
             raise
         if option is not None:
             self.sock.send(option)
         data = b""
-        while b"OK" not in data:
-            #while isinstance(data, bytes) and b"OK" not in data:
-            data = self.sock.recv(1024)
+        self.sock.settimeout(timeout)
 
     def __del__(self):
         if self.sock:
             self.sock.close()
 
     def query(self, sentence, pattern):
-        assert(isinstance(sentence, six.text_type))
+        # type: (, str, bytes) -> str
+        assert (isinstance(sentence, six.text_type))
         self.sock.sendall(b"%s\n" % sentence.encode('utf-8').strip())
         data = self.sock.recv(1024)
         assert isinstance(data, bytes)
@@ -52,44 +54,28 @@ class MonkeyPatchSocket(object):
         return recv.strip().decode('utf-8')
 
 
-class JumanWrapper(WrapperBase):
-    def __init__(self, command:str='juman', server:Union[str,None]=None,
-                 port:int=32000,
-                 timeout:int=30,
-                 rcfile:str=None,
-                 option:Union[bytes, str]='-e2 -B',
-                 pattern:Union[bytes, str]='EOS',
-                 **args):
-        """* Class to call Juman tokenizer
-        """
-        if not rcfile is None and not os.path.exists(rcfile): raise FileExistsError('rcfile does not exist at {}'.format(rcfile))
+class JumanppWrapper(WrapperBase):
+    """Class for Juman++"""
+    def __init__(self, command='jumanpp', timeout=30, pattern=r'EOS', server:str=None, port:int=12000, **args):
+        # type: (str, int, str, str) -> None
         if not server is None:
-            ### It converts from str into bytes only for sever mode ###
-            option = option.encode('utf-8')
             pattern = pattern.encode('utf-8')
 
-        self.juman = pyknp.Juman(command=command, server=server, port=port,
-                                 timeout=timeout, rcfile=rcfile, option=option,
-                                 pattern=pattern, **args)
-        ### It overwrites juman_lines() method ###
-        self.juman.juman_lines = self.__monkey_patch_juman_lines
-        self.timeout = timeout
 
-    def __monkey_patch_juman_lines(self, input_str:str):
-        """* What you can do
-        - It overwrites juman_line() method because this method causes TypeError in python3
-        """
-        if not self.juman.socket and not self.juman.subprocess:
-            if self.juman.server is not None:
-                self.juman.socket = MonkeyPatchSocket(self.juman.server, self.juman.port, b"RUN -e2\n")
-            else:
-                command = "%s %s" % (self.juman.command, self.juman.option)
-                if self.juman.rcfile:
-                    command += " -r %s" % self.juman.rcfile
-                self.juman.subprocess = pyknp.Subprocess(command)
-        if self.juman.socket:
-            return self.juman.socket.query(input_str, pattern=self.juman.pattern)
-        return self.juman.subprocess.query(input_str, pattern=self.juman.pattern)
+        self.eos_pattern = pattern
+        if server is None:
+            self.jumanpp_obj = Jumanpp(
+                command=command,
+                timeout=timeout,
+                pattern=pattern,
+                **args)
+        else:
+            self.jumanpp_obj = JumanppClient(hostname=server, port=port, timeout=timeout)
+
+    def __del__(self):
+        if isinstance(self.jumanpp_obj, JumanppClient):
+            self.jumanpp_obj.sock.close()
+        del self.jumanpp_obj
 
     def call_juman_interface(self, input_str):
         # type: (str) -> MList
@@ -99,8 +85,15 @@ class JumanWrapper(WrapperBase):
         * Output
         - pyknp.MList
         """
-        return self.juman.analysis(input_str)
+        if isinstance(self.jumanpp_obj, Jumanpp):
+            ml_token_object = self.jumanpp_obj.analysis(input_str=input_str)
+        elif isinstance(self.jumanpp_obj, JumanppClient):
+            server_response = self.jumanpp_obj.query(sentence=input_str, pattern=self.eos_pattern)
+            ml_token_object = MList(server_response)
+        else:
+            raise Exception('Not defined')
 
+        return ml_token_object
 
     def tokenize(self, sentence,
                  normalize=True,
@@ -109,28 +102,23 @@ class JumanWrapper(WrapperBase):
                  return_list=False,
                  func_normalizer=text_preprocess.normalize_text):
         # type: (str, bool, bool, bool, bool, Callable[[str], str]) -> Union[TokenizedSenetence, List[str]]
+        """* What you can do
+        -
         """
-        :param sentence:
-        :param ins_mecab:
-        :param list_stopword:
-        :param list_pos_candidate:
-        :return:  list [tuple (unicode, unicode)]
-        """
-        assert isinstance(normalize, bool)
-        assert isinstance(sentence, str)
         if normalize:
             normalized_sentence = func_normalizer(sentence)
         else:
             normalized_sentence = sentence
 
-        result = self.call_juman_interface(normalized_sentence)
+        ml_token_object = self.call_juman_interface(normalized_sentence)
+
         token_objects = [
             juman_utils.extract_morphological_information(
                 mrph_object=morph_object,
                 is_surface=is_surface,
                 is_feature=is_feature
             )
-            for morph_object in result]
+            for morph_object in ml_token_object]
 
         if return_list:
             tokenized_objects = TokenizedSenetence(
@@ -141,12 +129,11 @@ class JumanWrapper(WrapperBase):
             tokenized_objects = TokenizedSenetence(
                 sentence=sentence,
                 tokenized_objects=token_objects)
-
             return tokenized_objects
 
-    def filter(self, parsed_sentence:TokenizedSenetence, pos_condition:List[Tuple[str, ...]]=None, stopwords:List[str]=None)->FilteredObject:
+    def filter(self, parsed_sentence: TokenizedSenetence, pos_condition:List[Tuple[str,...]]=None, stopwords:List[str]=None) -> FilteredObject:
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
-        return parsed_sentence.filter(pos_condition, stopwords)
+        return  parsed_sentence.filter(pos_condition, stopwords)

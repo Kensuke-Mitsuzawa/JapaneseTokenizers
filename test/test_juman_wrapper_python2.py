@@ -135,6 +135,24 @@ class TestJumanWrapperPython2(unittest.TestCase):
             if word_stem in stopword: check_flag = False
         assert check_flag
 
+    def test_juman_server_mode(self):
+        ### test with server mode ###
+
+        ### Attention: this method causes Error if you don't start JUMAN SERVER mode ###
+        test_sentence = u"紗倉 まな（さくら まな、1993年3月23日 - ）は、日本のAV女優。"
+        juman_wrapper = JumanWrapper(server='localhost', port=32000)
+        token_objects = juman_wrapper.tokenize(sentence=test_sentence,
+                                               return_list=False,
+                                               is_feature=True)
+        self.assertTrue(isinstance(token_objects, TokenizedSenetence))
+
+
+        list_tokens = juman_wrapper.tokenize(sentence=test_sentence,
+                                               return_list=True,
+                                               is_feature=True)
+        self.assertTrue(isinstance(list_tokens, list))
+
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common import text_preprocess
-from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
-from JapaneseTokenizer.common import filter
+from JapaneseTokenizer.datamodels import TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer import init_logger
 import logging
 import sys
@@ -17,9 +17,7 @@ except ImportError:
 __author__ = 'kensuke-mi'
 
 
-
-
-class KyteaWrapper:
+class KyteaWrapper(WrapperBase):
     def __init__(self, option_string=''):
         assert isinstance(option_string, (str, str))
         # option string is argument of Kytea.
@@ -82,22 +80,21 @@ class KyteaWrapper:
 
         return result
 
-    def tokenize(self, sentence, normalize=True, is_feature=False, return_list=True):
+
+    def tokenize(self, sentence,
+                 normalize=True,
+                 is_feature=False,
+                 is_surface=False,
+                 return_list=False,
+                 func_normalizer=text_preprocess.normalize_text):
         """This method returns tokenized result.
         If return_list==True(default), this method returns list whose element is tuple consisted with word_stem and POS.
         If return_list==False, this method returns TokenizedSenetence object.
-
-        :param sentence: input sentence. str
-        :param normalize: boolean flag to make string normalization before tokenization
-        :param is_feature:
-        :param is_surface:
-        :param return_list:
-        :return:
         """
         assert isinstance(normalize, bool)
         assert isinstance(sentence, str)
         if normalize:
-            normalized_sentence = text_preprocess.normalize_text(sentence, dictionary_mode='ipadic')
+            normalized_sentence = func_normalizer(sentence)
         else:
             normalized_sentence = sentence
 
@@ -123,43 +120,9 @@ class KyteaWrapper:
 
             return tokenized_objects
 
-    def convert_str(self, p_c_tuple):
-        converted = []
-        for item in p_c_tuple:
-            if isinstance(item, str): converted.append(item)
-            else: converted.append(item)
-        return converted
-
-    def __check_pos_condition_str(self, pos_condistion):
-        assert isinstance(pos_condistion, list)
-        # [ ('', '', '') ]
-
-        return [
-            tuple(self.convert_str(p_c_tuple))
-            for p_c_tuple
-            in pos_condistion
-        ]
-
     def filter(self, parsed_sentence, pos_condition=None, stopwords=None):
         assert isinstance(parsed_sentence, TokenizedSenetence)
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
-        if isinstance(stopwords, type(None)):
-            s_words = []
-        else:
-            s_words = stopwords
-
-        if isinstance(pos_condition, type(None)):
-            p_condition = []
-        else:
-            p_condition = self.__check_pos_condition_str(pos_condition)
-
-        filtered_object = filter.filter_words(
-            tokenized_obj=parsed_sentence,
-            valid_pos=p_condition,
-            stopwords=s_words
-        )
-        assert isinstance(filtered_object, FilteredObject)
-
-        return filtered_object
+        return parsed_sentence.filter(pos_condition, stopwords)
