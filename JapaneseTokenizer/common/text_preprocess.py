@@ -9,12 +9,21 @@ import unicodedata
 __author__ = 'kensuke-mi'
 
 
-def normalize_text(input_text, dictionary_mode='ipadic'):
+def normalize_text(input_text, dictionary_mode='ipadic', new_line_replaced='。'):
+    # type: (str, str, str) -> str
+    """* What you can do
+    - It converts input-text into normalized-text which is good for tokenizer input.
+
+    * Params
+    - new_line_replaced: a string which replaces from \n string.
+    """
+    without_new_line = input_text.replace('\n', new_line_replaced)
+
     if dictionary_mode=='neologd':
         # this code comes from https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja
-        return normalize_neologd(input_text)
+        return normalize_neologd(without_new_line)
     else:
-        return normalize_text_normal_ipadic(input_text)
+        return normalize_text_normal_ipadic(without_new_line)
 
 
 def normalize_text_normal_ipadic(input_text):
