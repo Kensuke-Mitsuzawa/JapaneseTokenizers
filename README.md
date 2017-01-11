@@ -216,3 +216,8 @@ natto-py is sophisticated package for tokenization. It supports following featur
 * It fixed bugs in Juman server mode in python3.x
 * It supports Juman++
 * It supports `filter` method with chain expression
+
+## 1.2.6 (2017-01-12)
+
+* It introduced a paramter on text normalization function
+    * All `\n` strings are converted into `。`. This is because `\n` string in input-text causes tokenization error especially with server-mode. 
