@@ -13,7 +13,7 @@ custmoFormatter = Formatter(
 # StreamHandler
 STREAM_LEVEL = logging.DEBUG
 STREAM_FORMATTER = custmoFormatter
-STREAM = sys.stdout
+STREAM = sys.stderr
 
 st_handler = StreamHandler(stream=STREAM)
 st_handler.setLevel(STREAM_LEVEL)
