@@ -18,7 +18,7 @@ python_version = sys.version_info
 try:
     import pyknp
 except ImportError:
-    logger.error(msg='pyknp is not ready to use. Check your installing log.')
+    logger.warning(msg='pyknp is not ready to use. Install first if you would like to use pyknp wrapper.')
 
 
 class JumanWrapper(WrapperBase):
