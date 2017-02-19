@@ -2,6 +2,8 @@
 from setuptools import setup, find_packages
 import sys
 import pip
+import logging
+logger = logging.getLogger(__file__)
 
 python_version = sys.version_info
 
@@ -14,7 +16,7 @@ except ImportError:
         pip.main(['install', 'kytea'])
         import Mykytea
     except:
-        raise Exception('We failed to install mykytea automatically. Try installing scipy manually.')
+        logger.error('We failed to install mykytea automatically. Try installing scipy manually.')
 
 # --------------------------------------------------------------------------------------------------------
 # try to install pyknp automatically because it usually causes to error during installing
@@ -25,7 +27,7 @@ except ImportError:
         pip.main(['install', 'http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz'])
         import Mykytea
     except:
-        raise Exception('We failed to install pyknp automatically. Try installing scipy manually.')
+        logger.error('We failed to install pyknp automatically. Try installing scipy manually.')
 # --------------------------------------------------------------------------------------------------------
 
 if python_version >= (3, 0, 0):
@@ -66,9 +68,5 @@ setup(
     url = "https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers",
     test_suite='test.test_all.suite',
     install_requires = install_requires,
-    dependency_links=dependency_links,
-    packages=find_packages(),
-    extras_require=dict(
-        dev=dev_extras,
-    )
+    packages=find_packages()
 )
