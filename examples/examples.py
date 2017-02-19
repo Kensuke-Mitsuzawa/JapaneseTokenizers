@@ -24,15 +24,11 @@ def basic_example_mecab_2x():
     sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     # make MecabWrapper object
-    # path where `mecab-config` command exists. You can check it with `which mecab-config`
-    # default value is '/usr/local/bin'
-    path_mecab_config='/usr/local/bin'
-
     # you can choose from "neologd", "all", "ipaddic", "user", ""
     # "ipadic" and "" is equivalent
     dictType = "neologd"
 
-    mecab_wrapper = MecabWrapper(dictType=dictType, path_mecab_config=path_mecab_config)
+    mecab_wrapper = MecabWrapper(dictType=dictType)
 
     # tokenize sentence. Returned object is list of tuples
     tokenized_obj = mecab_wrapper.tokenize(sentence=sentence, return_list=True)
@@ -83,7 +79,7 @@ def basic_example_mecab_2x():
             token_obj.word_surface,
             token_obj.tuple_pos))
     ### You can write chain expression on init-instance -> tokenize -> filtering -> list  ###
-    filtered_result = MecabWrapper(dictType=dictType, path_mecab_config=path_mecab_config).tokenize(sentence).filter(pos_condition=pos_condition).convert_list_object()
+    filtered_result = MecabWrapper(dictType=dictType).tokenize(sentence).filter(pos_condition=pos_condition).convert_list_object()
     assert isinstance(filtered_result, list)
     print(filtered_result)
 
@@ -213,9 +209,6 @@ def basic_example_3x():
 
     # make MecabWrapper object
     # path where `mecab-config` command exists. You can check it with `which mecab-config`
-    # default value is '/usr/local/bin'
-    path_mecab_config='/usr/local/bin'
-
     # you can choose from "neologd", "all", "ipaddic", "user", ""
     # "ipadic" and "" is equivalent
     dictType = ""
@@ -254,7 +247,7 @@ def basic_example_3x():
     )
     assert isinstance(filtered_obj, FilteredObject)
     ### You can write chain expression on init-instance -> tokenize -> filtering -> list  ###
-    filtered_result = MecabWrapper(dictType=dictType, path_mecab_config=path_mecab_config).tokenize(sentence).filter(
+    filtered_result = MecabWrapper(dictType=dictType).tokenize(sentence).filter(
         pos_condition=pos_condition).convert_list_object()
     assert isinstance(filtered_result, list)
     print(filtered_result)

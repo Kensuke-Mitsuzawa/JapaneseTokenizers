@@ -17,13 +17,14 @@ python_version = sys.version_info
 
 
 class MecabWrapper(WrapperBase):
-    def __init__(self, dictType, pathUserDictCsv='', path_mecab_config='/usr/local/bin/', osType=''):
+    def __init__(self, dictType, pathUserDictCsv='', path_mecab_config=None):
         # type: (str, str, str, str)->None
         assert dictType in ["neologd", "all", "ipaddic", "user", ""]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
-        self._path_mecab_config = path_mecab_config
-        if osType != '':
-            logger.warn('osType argument is abolished. This argument might be unavailable in next version.')
+        if path_mecab_config is None:
+            self._path_mecab_config = self.__get_path_to_mecab_config()
+        else:
+            self._path_mecab_config = path_mecab_config
 
         self._dictType = dictType
         self._pathUserDictCsv = pathUserDictCsv
@@ -32,6 +33,15 @@ class MecabWrapper(WrapperBase):
         logger.info("mecab dictionary path is detected under {}".format(self._mecab_dictionary_path))
 
         self.mecabObj = self.__CallMecab()
+
+    def __get_path_to_mecab_config(self):
+        """* What you can do
+        - You get path into mecab-config
+        """
+        path_mecab_config_dir = subprocess.check_output(['which', 'mecab-config'])
+        path_mecab_config_dir = path_mecab_config_dir.strip().replace('/mecab-config', '')
+        logger.info(msg='mecab-config is detected at {}'.format(path_mecab_config_dir))
+        return path_mecab_config_dir
 
 
     def __check_mecab_dict_path(self):

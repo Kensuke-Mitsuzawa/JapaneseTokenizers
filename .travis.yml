@@ -1,14 +1,44 @@
 language: python
 python:
-  - "2.7"
-  - "3.5"
-install:
+  - 2.7
+  - 3.5
+addons:
+  apt:
+    packages:
+    - git
+    - make
+    - curl
+    - xz-utils
+    - file
+    - juman
+    - pandoc
+    - libboost-dev
+    - language-pack-ja-base
+    - language-pack-ja
+    - ibus-mozc
+    - gcc-4.9
+    - g++-4.9
+    - build-essential
+    sources:
+    - ubuntu-toolchain-r-test
+before_install:
   - sudo apt-get update -qq
+  - sudo update-locale LANG=ja_JP.UTF-8 LANGUAGE="ja_JP:ja"
+  - mkdir ./target
+  - sudo bash travis-mecab-install.sh
+  - which mecab-config
   - sudo make install
+  - git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git
+  - cd mecab-ipadic-neologd && echo yes | sudo ./bin/install-mecab-ipadic-neologd && cd ../
+  - sudo juman -S
+install:
+  - python --version
   - sudo python setup.py install
-  - 
-script: unittest
-
+  - sudo pip install coveralls coverage nose
+script:
+  - sudo coverage run --source=JapaneseTokenizer setup.py test
+after_success:
+  - sudo coveralls
 notifications:
   email:
     recipients:

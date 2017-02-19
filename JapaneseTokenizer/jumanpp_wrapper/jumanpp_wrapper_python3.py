@@ -5,6 +5,8 @@ from JapaneseTokenizer.common import text_preprocess, juman_utils
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
 from typing import List, Dict, Tuple, Union, TypeVar
+# timeout
+from JapaneseTokenizer.common.timeout_handler import on_timeout
 import logging
 import sys
 import socket
@@ -93,8 +95,9 @@ class JumanppWrapper(WrapperBase):
         else:
             raise Exception('Not defined')
 
-        return ml_token_object
+        return ml_token_object\
 
+    @on_timeout(limit=60)
     def tokenize(self, sentence,
                  normalize=True,
                  is_feature=False,
