@@ -1,4 +1,0 @@
-six
-git+https://github.com/chezou/Mykytea-python
-pypandoc
-bin/pyknp-0.3.tar.gz

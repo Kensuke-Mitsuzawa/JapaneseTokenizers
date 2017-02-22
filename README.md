@@ -59,12 +59,20 @@ Kytea has a different algorithm from one of Mecab or Juman.
  
 # Setting up
 
+## Tokenizers auto-install
 
-## MeCab
+```
+make install
+```
+
+## Tokenizers manual-install
+
+
+### MeCab
 
 See [here](https://github.com/jordwest/mecab-docs-en) to install MeCab system.
 
-## Mecab Neologd dictionary
+### Mecab Neologd dictionary
 
 Mecab-neologd dictionary is a dictionary-extension based on ipadic-dictionary, which is basic dictionary of Mecab.
 
@@ -74,7 +82,7 @@ Here, new-coming words is such like, movie actor name or company name.....
 
 See [here](https://github.com/neologd/mecab-ipadic-neologd) and install mecab-neologd dictionary.
 
-## Juman
+### Juman
 
     wget -O juman7.0.1.tar.bz2 "http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/juman/juman-7.01.tar.bz2&name=juman-7.01.tar.bz2"
     bzip2 -dc juman7.0.1.tar.bz2  | tar xvf -
@@ -83,7 +91,7 @@ See [here](https://github.com/neologd/mecab-ipadic-neologd) and install mecab-ne
     make   
     [sudo] make install
     
-## Juman++
+### Juman++
 
 * GCC version must be >= 5
 
@@ -96,7 +104,7 @@ make
 [sudo] make install
 ```
     
-## Kytea
+### Kytea
 
 Install Kytea system
 
@@ -113,13 +121,6 @@ Install Kytea-python wrapper
 
     pip install kytea
     
-# Part-of-speech structure
-
-Mecab, Juman uses different system of Part-of-Speech(POS).
-
-Keep in your mind when you use it.
-
-You can check tables of Part-of-Speech(POS) [here](http://www.unixuser.org/~euske/doc/postag/)
 
 ## install
 
@@ -127,8 +128,13 @@ You can check tables of Part-of-Speech(POS) [here](http://www.unixuser.org/~eusk
 [sudo] python setup.py install
 ```
 
-# Usage
+### Note
 
+During install, you see warning message when it fails to install `pyknp` or `kytea`.
+
+if you see these messages, try to re-install these packages manually.
+
+# Usage
 
 Tokenization Example(For python2x. To see exmaple code for Python3.x, plaese see [here](https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers/blob/master/examples/examples.py))
 
@@ -172,6 +178,14 @@ Filtering example
         parsed_sentence=tokenized_obj,
         pos_condition=pos_condition
     )
+
+## Part-of-speech structure
+
+Mecab, Juman uses different system of Part-of-Speech(POS).
+
+Keep in your mind when you use it.
+
+You can check tables of Part-of-Speech(POS) [here](http://www.unixuser.org/~euske/doc/postag/)
 
 
 # Similar Package
@@ -221,3 +235,12 @@ natto-py is sophisticated package for tokenization. It supports following featur
 
 * It introduced a paramter on text normalization function
     * All `\n` strings are converted into `。`. This is because `\n` string in input-text causes tokenization error especially with server-mode. 
+
+## 1.2.8 (2017-02-22)
+
+* It has make file for installing tokenizers.
+* It is tested with travis.
+
+# LICENSE
+
+MIT license
