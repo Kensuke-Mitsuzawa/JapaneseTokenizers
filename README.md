@@ -65,8 +65,13 @@ Kytea has a different algorithm from one of Mecab or Juman.
 make install
 ```
 
-## Tokenizers manual-install
+### mecab-neologd dictionary auto-install
 
+```
+make install_neologd
+```
+
+## Tokenizers manual-install
 
 ### MeCab
 
