@@ -20,7 +20,7 @@ python_version = sys.version_info
 
 class MecabWrapper(WrapperBase):
     def __init__(self, dictType:str, pathUserDictCsv:str=None, path_mecab_config:Union[None,str]=None):
-        assert dictType in ["neologd", "all", "ipaddic", "user", ""]
+        assert dictType in ["neologd", "all", "ipadic", "ipaddic", "user", "", None]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
         if path_mecab_config is None:
             self._path_mecab_config = self.__get_path_to_mecab_config()

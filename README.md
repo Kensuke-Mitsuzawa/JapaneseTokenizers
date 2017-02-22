@@ -98,7 +98,6 @@ See [here](https://github.com/neologd/mecab-ipadic-neologd) and install mecab-ne
     
 
 ## Juman++
->>>>>>> travis
 
 * GCC version must be >= 5
 

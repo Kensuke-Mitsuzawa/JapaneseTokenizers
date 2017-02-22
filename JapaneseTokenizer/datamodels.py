@@ -1,6 +1,7 @@
 #! -*- coding: utf-8 -*-
+from JapaneseTokenizer.common.text_preprocess import denormalize_text
 from MeCab import Node
-from typing import List, Union, Any, Tuple, Dict
+from typing import List, Union, Any, Tuple, Dict, Callable
 from future.utils import string_types, text_type
 import sys
 __author__ = 'kensuke-mi'
@@ -105,35 +106,60 @@ class TokenizedResult(object):
 
 class TokenizedSenetence(object):
     def __init__(self, sentence, tokenized_objects):
-        # type: (Union[unicode,str], List[TokenizedResult]) -> None
+        """* Args"""
+        # type: (Union[unicode,str], List[TokenizedResult])->None
         assert isinstance(sentence, (str, string_types))
         assert isinstance(tokenized_objects, list)
 
         self.sentence = sentence
         self.tokenized_objects = tokenized_objects
 
-    def __extend_token_object(self, token_object):
+    def __extend_token_object(self, token_object,
+                              is_denormalize=True,
+                              func_denormalizer=denormalize_text):
         """This method creates dict object from token object.
         """
+        # type: (TokenizedResult,bool,Callable[[str],str])->Tuple[str,...]
         assert isinstance(token_object, TokenizedResult)
 
-        if token_object.is_feature == True:
-            if token_object.is_surface == True:
-                token = (token_object.word_surface, token_object.tuple_pos)
+        if is_denormalize:
+            if token_object.is_feature == True:
+                if token_object.is_surface == True:
+                    token = (func_denormalizer(token_object.word_surface), func_denormalizer(token_object.tuple_pos))
+                else:
+                    token = (func_denormalizer(token_object.word_stem), func_denormalizer(token_object.tuple_pos))
             else:
-                token = (token_object.word_stem, token_object.tuple_pos)
+                if token_object.is_surface == True:
+                    token = func_denormalizer(token_object.word_surface)
+                else:
+                    token = func_denormalizer(token_object.word_stem)
         else:
-            if token_object.is_surface == True:
-                token = token_object.word_surface
+            if token_object.is_feature == True:
+                if token_object.is_surface == True:
+                    token = (token_object.word_surface, token_object.tuple_pos)
+                else:
+                    token = (token_object.word_stem, token_object.tuple_pos)
             else:
-                token = token_object.word_stem
+                if token_object.is_surface == True:
+                    token = token_object.word_surface
+                else:
+                    token = token_object.word_stem
 
         return token
 
-    def convert_list_object(self):
-        # type: () -> List[Union[str, Tuple[str,str]]]
+    def convert_list_object(self,
+                            is_denormalize=True,
+                            func_denormalizer=denormalize_text):
+        """* What you can do
+        - You extract string object from TokenizedResult object
+
+        * Args
+        - is_denormalize: boolen object. True; it makes denormalize string
+        - func_denormalizer: callable object. de-normalization function.
+        """
+        # type: (bool,Callable[[str],str])->List[Union[str, Tuple[str,...]]]
         sentence_in_list_obj = [
-            self.__extend_token_object(token_object)
+            self.__extend_token_object(token_object,is_denormalize,func_denormalizer)
             for token_object
             in self.tokenized_objects
         ]
@@ -141,7 +167,8 @@ class TokenizedSenetence(object):
         return sentence_in_list_obj
 
     def __convert_str(self, p_c_tuple):
-        # type: (Tuple[str, ...]) -> List[str]
+        """"""
+        # type: (Tuple[str,...])->List[str]
         converted = []
         for item in p_c_tuple:
             if isinstance(item, str):
@@ -151,7 +178,6 @@ class TokenizedSenetence(object):
         return converted
 
     def __check_pos_condition_str(self, pos_condistion):
-        # type: (List[Tuple[str, ...]]) -> List[Tuple[str, ...]]
         """* What you can do
         - Check your pos condition is correct or NOT
 
@@ -161,6 +187,7 @@ class TokenizedSenetence(object):
             - Keep in your mind, each tokenizer has different POS structure.
             >>> [('名詞', '固有名詞'), ('動詞', )]
         """
+        # type: (List[Tuple[str, ...]])->List[Tuple[str, ...]]
         assert isinstance(pos_condistion, list)
         # [ ('', '', '') ]
 
@@ -170,7 +197,9 @@ class TokenizedSenetence(object):
             in pos_condistion]
 
     def filter(self, pos_condition=None, stopwords=None):
-        # type: (List[Tuple[Union[unicode,str],...]], List[Union[unicode,str]]) ->  FilteredObject
+        """* What you can do
+        """
+        # type: (List[Tuple[Union[unicode,str],...]], List[Union[unicode,str]])->FilteredObject
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
@@ -196,7 +225,8 @@ class TokenizedSenetence(object):
 
 class FilteredObject(TokenizedSenetence):
     def __init__(self, sentence, tokenized_objects, pos_condition, stopwords):
-        # type: (str, List[TokenizedResult], List[str, ...], List[str]) -> None
+        """"""
+        # type: (str, List[TokenizedResult], List[str, ...], List[str])->None
         super(FilteredObject, self).__init__(
             sentence=sentence,
             tokenized_objects=tokenized_objects

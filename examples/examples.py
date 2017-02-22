@@ -8,6 +8,9 @@ from JapaneseTokenizer import TokenizedSenetence
 from JapaneseTokenizer import FilteredObject
 from JapaneseTokenizer import KyteaWrapper
 from JapaneseTokenizer.datamodels import TokenizedResult
+from JapaneseTokenizer import init_logger
+import logging
+logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 __author__ = 'kensuke-mi'
 
 python_version = sys.version_info
@@ -21,10 +24,10 @@ def basic_example_mecab_2x():
     # ========================================================
 
     # input is `unicode` type(in python2x)
-    sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = u'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     # make MecabWrapper object
-    # you can choose from "neologd", "all", "ipaddic", "user", ""
+    # you can choose from "neologd", "all", "ipadic", "user", "", None
     # "ipadic" and "" is equivalent
     dictType = "neologd"
 
@@ -86,7 +89,7 @@ def basic_example_mecab_2x():
 
 def basic_example_juman_2x():
     # input is `unicode` type(in python2x)
-    sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = u'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     juman_wrapper = JumanWrapper()
     tokenized_objects = juman_wrapper.tokenize(
@@ -118,7 +121,7 @@ def basic_example_juman_2x():
 
 def basic_example_jumanpp_2x():
     # input is `unicode` type(in python2x)
-    sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = u'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     jumanpp_wrapper = JumanppWrapper()
     tokenized_objects = jumanpp_wrapper.tokenize(
@@ -150,7 +153,7 @@ def basic_example_jumanpp_2x():
 
 def basic_example_kytea_2x():
     # input is `unicode` type(in python2x)
-    sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = u'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     kytea_wrapper = KyteaWrapper()
     tokenized_objects = kytea_wrapper.tokenize(
@@ -188,7 +191,7 @@ def advanced_example_mecab_2x():
     )
     print('-'*30)
     print(u'Mecab UserDictionary Demo')
-    sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = u'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
     tokenized_obj = mecab_wrapper.tokenize(sentence, return_list=False)
     assert isinstance(tokenized_obj, TokenizedSenetence)
     for token_obj in tokenized_obj.tokenized_objects:
@@ -206,7 +209,7 @@ def basic_example_3x():
     # ========================================================
 
     # In python3x, you don't mind it
-    sentence = 'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = 'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     # make MecabWrapper object
     # path where `mecab-config` command exists. You can check it with `which mecab-config`
@@ -223,6 +226,9 @@ def basic_example_3x():
     # Returned object is "TokenizedSenetence" class if you put return_list=False
     tokenized_obj = mecab_wrapper.tokenize(sentence=sentence, return_list=False)
     assert isinstance(tokenized_obj, TokenizedSenetence)
+    print('-'*30)
+    print('Mecab Demo')
+    print(tokenized_obj.convert_list_object())
 
     # ========================================================
     # FILTERING
@@ -244,29 +250,26 @@ def basic_example_3x():
     pos_condition = [('名詞', '固有名詞'), ('動詞', '自立')]
     filtered_obj = mecab_wrapper.filter(
         parsed_sentence=tokenized_obj,
-        pos_condition=pos_condition
-    )
+        pos_condition=pos_condition)
     assert isinstance(filtered_obj, FilteredObject)
     ### You can write chain expression on init-instance -> tokenize -> filtering -> list  ###
-    filtered_result = MecabWrapper(dictType=dictType).tokenize(sentence).filter(
-        pos_condition=pos_condition).convert_list_object()
+    filtered_result = MecabWrapper(dictType=dictType).tokenize(sentence).filter(pos_condition=pos_condition).convert_list_object()
     assert isinstance(filtered_result, list)
-    print(filtered_result)
 
 
 def basic_example_juman_3x():
     # input is `str` type(in python3x)
-    sentence = 'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = 'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     juman_wrapper = JumanWrapper()
     tokenized_objects = juman_wrapper.tokenize(
         sentence=sentence,
         normalize=True,
-        return_list=False
-    )
+        return_list=False)
     assert isinstance(tokenized_objects, TokenizedSenetence)
     print('-'*30)
     print('Juman Demo')
+    print(tokenized_objects.convert_list_object())
     for token_object in tokenized_objects.tokenized_objects:
         assert isinstance(token_object, TokenizedResult)
         print('word_stem:{}, word_surafce:{}, pos:{}'.format(
@@ -275,19 +278,25 @@ def basic_example_juman_3x():
             token_object.tuple_pos))
 
     ### You can call juman with server mode. You must start JUMAN as server mode beforehand ###
-    juman_wrapper = JumanWrapper(server='localhost', port=32000)
-    tokens_list = juman_wrapper.tokenize(sentence=sentence, return_list=True)
-    assert isinstance(tokens_list, list)
+    try:
+        juman_wrapper = JumanWrapper(server='localhost', port=32000)
+        tokens_list = juman_wrapper.tokenize(sentence=sentence, return_list=True)
+        assert isinstance(tokens_list, list)
+    except ConnectionRefusedError:
+        logger.error(msg='Juman server is not ready.')
 
     # filtering is same as mecab
-    filtered_result = JumanWrapper(server='localhost', port=32000).tokenize(sentence, return_list=False).filter(pos_condition=[('名詞',)]).convert_list_object()
-    assert isinstance(filtered_result, list)
-    print(filtered_result)
+    try:
+        filtered_result = JumanWrapper(server='localhost', port=32000).tokenize(sentence, return_list=False).filter(pos_condition=[('名詞',)]).convert_list_object()
+        assert isinstance(filtered_result, list)
+        print(filtered_result)
+    except ConnectionRefusedError:
+        logger.error(msg='Juman server is not ready.')
 
 
 def basic_example_jumanpp_3x():
     # input is `unicode` type(in python3x)
-    sentence = 'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = 'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     jumanpp_wrapper = JumanppWrapper()
     tokenized_objects = jumanpp_wrapper.tokenize(
@@ -298,6 +307,7 @@ def basic_example_jumanpp_3x():
     assert isinstance(tokenized_objects, TokenizedSenetence)
     print('-' * 30)
     print('Juman++ Demo')
+    print(tokenized_objects.convert_list_object())
     for token_object in tokenized_objects.tokenized_objects:
         assert isinstance(token_object, TokenizedResult)
         print('word_stem:{}, word_surafce:{}, pos:{}'.format(
@@ -321,7 +331,7 @@ def basic_example_jumanpp_3x():
 
 def basic_example_kytea_3x():
     # input is `str` type(in python3x)
-    sentence = 'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = 'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
     kytea_wrapper = KyteaWrapper()
     tokenized_objects = kytea_wrapper.tokenize(
@@ -331,6 +341,7 @@ def basic_example_kytea_3x():
     assert isinstance(tokenized_objects, TokenizedSenetence)
     print('-'*30)
     print('Kytea Demo')
+    print(tokenized_objects.convert_list_object())
     for token_object in tokenized_objects.tokenized_objects:
         assert isinstance(token_object, TokenizedResult)
         # kytea does not show word stem, thus word_stem attribute is always null string
@@ -358,7 +369,7 @@ def advanced_example_3x():
         dictType='user',
         pathUserDictCsv=example_user_dict
     )
-    sentence = 'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+    sentence = 'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
     tokenized_obj = mecab_wrapper.tokenize(sentence, return_list=False)
     assert isinstance(tokenized_obj, TokenizedSenetence)
     for token_obj in tokenized_obj.tokenized_objects:

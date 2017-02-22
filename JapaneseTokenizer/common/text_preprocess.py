@@ -6,31 +6,50 @@ from __future__ import division
 import jaconv
 import re
 import unicodedata
+import neologdn
 __author__ = 'kensuke-mi'
 
 
-def normalize_text(input_text, dictionary_mode='ipadic', new_line_replaced='。'):
-    # type: (str, str, str) -> str
+def denormalize_text(input_text):
+    """* What you can do
+    - It converts text into standard japanese writing way
+
+    * Note
+    - hankaku-katakana is to zenkaku-katakana
+    - zenkaku-eisu is to hankaku-eisu
+    """
+    # type: (str)->str
+    return jaconv.z2h(input_text, kana=False, ascii=True, digit=True)
+
+
+def normalize_text(input_text,
+                   dictionary_mode='ipadic',
+                   new_line_replaced='。',
+                   is_kana=True,
+                   is_ascii=True,
+                   is_digit=True):
     """* What you can do
     - It converts input-text into normalized-text which is good for tokenizer input.
 
     * Params
     - new_line_replaced: a string which replaces from \n string.
     """
+    # type: (str,str,str,bool,bool,bool)->str
     without_new_line = input_text.replace('\n', new_line_replaced)
 
     if dictionary_mode=='neologd':
         # this code comes from https://github.com/neologd/mecab-ipadic-neologd/wiki/Regexp.ja
-        return normalize_neologd(without_new_line)
+        return neologdn.normalize(without_new_line)
     else:
-        return normalize_text_normal_ipadic(without_new_line)
+        return normalize_text_normal_ipadic(without_new_line, kana=is_kana, ascii=is_ascii, digit=is_digit)
 
 
-def normalize_text_normal_ipadic(input_text):
+def normalize_text_normal_ipadic(input_text, kana=True, ascii=True, digit=True):
     """
     * All hankaku Katanaka is converted into Zenkaku Katakana
     * All hankaku English alphabet and numberc string are converted into Zenkaku one
     """
+    # type: (str,bool,bool,bool)->str
     return jaconv.h2z(input_text, kana=True, ascii=True, digit=True)
 
 
@@ -43,6 +62,7 @@ def unicode_normalize(cls, s):
     s = ''.join(norm(x) for x in re.split(pt, s))
     return s
 
+'''
 def remove_extra_spaces(s):
     s = re.sub('[ 　]+', ' ', s)
     blocks = ''.join(('\u4E00-\u9FFF',  # CJK UNIFIED IDEOGRAPHS
@@ -81,4 +101,4 @@ def normalize_neologd(s):
     s = unicode_normalize('！”＃＄％＆’（）＊＋，−．／：；＜＞？＠［￥］＾＿｀｛｜｝〜', s)  # keep ＝,・,「,」
     s = re.sub('[’]', '\'', s)
     s = re.sub('[”]', '"', s)
-    return s
+    return s'''
