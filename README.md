@@ -248,6 +248,12 @@ natto-py is sophisticated package for tokenization. It supports following featur
 * It has make file for installing tokenizers.
 * It is tested with travis.
 
+## 1.3.0 (2017-02-23)
+
+* It introduced de-normalization function after tokenization process. (全角英数 -> 半角英数)
+* For mecab-config, it detects path to mecab-config automatically
+* It fixed a bug of initializing juman-object in python2
+
 # LICENSE
 
 MIT license
