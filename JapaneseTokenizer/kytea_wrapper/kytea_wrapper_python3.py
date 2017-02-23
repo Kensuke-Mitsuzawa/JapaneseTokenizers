@@ -12,7 +12,7 @@ python_version = sys.version_info
 try:
     import Mykytea
 except ImportError:
-    logger.error(msg='Mykytea is not ready to use yet. Install first')
+    logger.warning(msg='Mykytea is not ready to use yet. Install first if you would like to use kytea wrapper.')
 
 __author__ = 'kensuke-mi'
 

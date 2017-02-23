@@ -35,9 +35,8 @@ class TestMecabWrapperPython2(unittest.TestCase):
 
     def test_init_userdict(self):
         dictType = "user"
-        osType = "mac"
 
-        mecab_obj = MecabWrapper(dictType=dictType, pathUserDictCsv=self.path_user_dict, osType=osType)
+        mecab_obj = MecabWrapper(dictType=dictType, pathUserDictCsv=self.path_user_dict)
         assert isinstance(mecab_obj, MecabWrapper)
 
         res = mecab_obj.tokenize(sentence=self.test_senetence, return_list=True)

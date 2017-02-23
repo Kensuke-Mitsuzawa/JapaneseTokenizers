@@ -18,7 +18,7 @@ python_version = sys.version_info
 try:
     import pyknp
 except ImportError:
-    logger.error(msg='pyknp is not ready to use. Check your installing log.')
+    logger.warning(msg='pyknp is not ready to use. Install first if you would like to use pyknp wrapper.')
 
 
 class JumanWrapper(WrapperBase):
@@ -35,7 +35,7 @@ class JumanWrapper(WrapperBase):
         if not rcfile is None and not os.path.exists(rcfile): raise Exception(
             'rcfile does not exist at {}'.format(rcfile))
         if server is None:
-            server = ''
+            server = None
         else:
             server = server
 

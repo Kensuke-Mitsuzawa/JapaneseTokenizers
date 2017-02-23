@@ -2,23 +2,51 @@
 from setuptools import setup, find_packages
 import sys
 import pip
+import logging
+import codecs
+logger = logging.getLogger(__file__)
 
 python_version = sys.version_info
 
+# --------------------------------------------------------------------------------------------------------
+# try to install kytea automatically because it usually causes to error during installing
+try:
+    import Mykytea
+except ImportError:
+    try:
+        pip.main(['install', 'kytea'])
+    except:
+        logger.error('We failed to install mykytea automatically. Try installing kytea manually.')
 
-# check required libraries
-dev_extras = ['pyknp']
-dependency_links = ['http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz']
+    try:
+        import Mykytea
+    except ImportError:
+        logger.error('We failed to install mykytea automatically. Try installing kytea manually.')
 
-# Try to install packages not controlled by pip
-for package_url in dependency_links: pip.main(['install', package_url])
+# --------------------------------------------------------------------------------------------------------
+# try to install pyknp automatically because it usually causes to error during installing
+try:
+    import pyknp
+except ImportError:
+    try:
+        pip.main(['install', 'http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz'])
+    except:
+        logger.error('We failed to install pyknp automatically. Try installing pyknp manually.')
+
+    try:
+        import pyknp
+    except ImportError:
+        logger.error('We failed to install pyknp automatically. Try installing pyknp manually.')
+# --------------------------------------------------------------------------------------------------------
 
 if python_version >= (3, 0, 0):
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv>=0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
+    logger.info(msg='python={}'.format(python_version))
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'neologdn']
 else:
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pyknp', 'kytea', 'pip>=8.1.0', 'typing']
+    logger.info(msg='python={}'.format(python_version))
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'neologdn']
 
-version = '1.2.7'
+version = '1.3.0'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
@@ -26,7 +54,7 @@ try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst')
 except(IOError, ImportError):
-    long_description = open('README.md').read()
+    long_description = codecs.open('README.md', 'r', 'utf-8').read()
 
 classifiers = [
         "Development Status :: 5 - Production/Stable",
@@ -51,9 +79,5 @@ setup(
     url = "https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers",
     test_suite='test.test_all.suite',
     install_requires = install_requires,
-    dependency_links=dependency_links,
-    packages=find_packages(),
-    extras_require=dict(
-        dev=dev_extras,
-    )
+    packages=find_packages()
 )

@@ -1,9 +1,0 @@
-pytest
-joblib
-typing
-jaconv
-six
-pypandoc
-future
-mecab-python3
-git+https://github.com/chezou/Mykytea-python
