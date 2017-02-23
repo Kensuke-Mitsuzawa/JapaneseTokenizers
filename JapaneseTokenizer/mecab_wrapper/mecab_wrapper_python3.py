@@ -4,6 +4,7 @@ import os
 import subprocess
 import MeCab
 import logging
+import neologdn
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.common.text_preprocess import normalize_text
 from JapaneseTokenizer.object_models import WrapperBase
@@ -213,7 +214,7 @@ class MecabWrapper(WrapperBase):
                  is_feature:bool=False,
                  is_surface:bool=False,
                  return_list:bool=False,
-                 func_normalizer:Callable[[str], str]=None
+                 func_normalizer:Callable[[str], str]=normalize_text
                  )->Union[TokenizedSenetence, List[ContentsTypes]]:
         """* What you can do
         -
@@ -221,11 +222,11 @@ class MecabWrapper(WrapperBase):
         assert isinstance(sentence, str)
         ### decide normalization function depending on dictType
         if func_normalizer is None and self._dictType == 'neologd':
-            normalized_sentence = normalize_text(sentence, dictionary_mode='neologd')
-            normalized_sentence = normalized_sentence.replace('　', '')
+            normalized_sentence = neologdn.normalize(sentence)
+        elif func_normalizer == normalize_text:
+            normalized_sentence = normalize_text(sentence, dictionary_mode=self._dictType)
         elif func_normalizer is None:
-            normalized_sentence = normalize_text(sentence)
-            normalized_sentence = normalized_sentence.replace('　', '')
+            normalized_sentence = sentence
         else:
             normalized_sentence = func_normalizer(sentence)
 

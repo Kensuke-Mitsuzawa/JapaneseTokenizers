@@ -4,6 +4,7 @@ import os
 import logging
 import subprocess
 import MeCab
+import neologdn
 from typing import List, Union, Any, Tuple, Callable
 from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common.text_preprocess import normalize_text
@@ -19,7 +20,7 @@ python_version = sys.version_info
 class MecabWrapper(WrapperBase):
     def __init__(self, dictType, pathUserDictCsv='', path_mecab_config=None):
         # type: (str, str, str, str)->None
-        assert dictType in ["neologd", "all", "ipaddic", "user", ""]
+        assert dictType in ["neologd", "all", "ipaddic", "ipaddic", "user", "", None]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
         if path_mecab_config is None:
             self._path_mecab_config = self.__get_path_to_mecab_config()
@@ -169,19 +170,19 @@ class MecabWrapper(WrapperBase):
                  is_feature=False,
                  is_surface=False,
                  return_list=False,
-                 func_normalizer=None):
-        # type: (, str, bool, bool, bool, bool, Callable[[str], str])->Union[List[str], TokenizedSenetence]
+                 func_normalizer=normalize_text):
         """* What you can do
         - Call mecab tokenizer, and return tokenized objects
 
         """
+        # type: (str, bool, bool, bool, bool, Callable[[str], str])->Union[List[str], TokenizedSenetence]
         ### decide normalization function depending on dictType
         if func_normalizer is None and self._dictType == 'neologd':
-            normalized_sentence = normalize_text(sentence, dictionary_mode='neologd')
-            normalized_sentence = normalized_sentence.replace(u'　', u'')
+            normalized_sentence = neologdn.normalize(sentence)
+        elif func_normalizer == normalize_text:
+            normalized_sentence = normalize_text(sentence, dictionary_mode=self._dictType)
         elif func_normalizer is None:
-            normalized_sentence = normalize_text(sentence)
-            normalized_sentence = normalized_sentence.replace(u'　', u'')
+            normalized_sentence = sentence
         else:
             normalized_sentence = func_normalizer(sentence)
 
