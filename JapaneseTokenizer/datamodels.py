@@ -125,9 +125,9 @@ class TokenizedSenetence(object):
         if is_denormalize:
             if token_object.is_feature == True:
                 if token_object.is_surface == True:
-                    token = (func_denormalizer(token_object.word_surface), func_denormalizer(token_object.tuple_pos))
+                    token = (func_denormalizer(token_object.word_surface), token_object.tuple_pos)
                 else:
-                    token = (func_denormalizer(token_object.word_stem), func_denormalizer(token_object.tuple_pos))
+                    token = (func_denormalizer(token_object.word_stem), token_object.tuple_pos)
             else:
                 if token_object.is_surface == True:
                     token = func_denormalizer(token_object.word_surface)

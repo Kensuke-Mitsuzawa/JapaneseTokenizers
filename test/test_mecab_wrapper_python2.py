@@ -35,7 +35,6 @@ class TestMecabWrapperPython2(unittest.TestCase):
 
     def test_init_userdict(self):
         dictType = "user"
-        osType = "mac"
 
         mecab_obj = MecabWrapper(dictType=dictType, pathUserDictCsv=self.path_user_dict)
         assert isinstance(mecab_obj, MecabWrapper)

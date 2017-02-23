@@ -95,8 +95,7 @@ def basic_example_juman_2x():
     tokenized_objects = juman_wrapper.tokenize(
         sentence=sentence,
         normalize=True,
-        return_list=False
-    )
+        return_list=False)
     assert isinstance(tokenized_objects, TokenizedSenetence)
     print('-'*30)
     print(u'Juman Demo')

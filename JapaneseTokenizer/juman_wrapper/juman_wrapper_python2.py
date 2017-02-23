@@ -35,7 +35,7 @@ class JumanWrapper(WrapperBase):
         if not rcfile is None and not os.path.exists(rcfile): raise Exception(
             'rcfile does not exist at {}'.format(rcfile))
         if server is None:
-            server = ''
+            server = None
         else:
             server = server
 
