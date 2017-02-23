@@ -1,6 +1,7 @@
 include README.md
 include README_JP.md
 include examples
-include install_python_dependencies.py
-include requirement.txt
 include test
+include install_tokenizers.sh
+include LICENSE.txt
+include Makefile
