@@ -31,6 +31,8 @@ class JumanppClient(object):
         # type: (str, int, int, Dict[string_types,Any])->None
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if isinstance(port, str):
+                port = int(port)
             self.sock.connect((hostname, port))
         except:
             raise Exception("There is no jumanpp server hostname={}, port={}".format(hostname, port))
