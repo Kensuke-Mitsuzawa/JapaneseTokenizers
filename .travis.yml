@@ -34,12 +34,12 @@ before_install:
   - sudo juman -S
 install:
   - python --version
-  - sudo python setup.py install
-  - sudo pip install coveralls coverage nose
+  - python setup.py install
+  - pip install coveralls coverage nose
 script:
-  - sudo coverage run --source=JapaneseTokenizer setup.py test
+  - coverage run --source=JapaneseTokenizer setup.py test
 after_success:
-  - sudo coveralls
+  - coveralls
 notifications:
   email:
     recipients:
