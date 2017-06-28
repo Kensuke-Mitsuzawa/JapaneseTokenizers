@@ -11,32 +11,41 @@ else:
 import sys
 import unittest
 import os
+import time
+import daemon
 
 __author__ = 'kensuke-mi'
 
-import time
-
-
 
 class TestServerHandler(unittest.TestCase):
-    def setUp(self):
-        self.test_senetence = u'紗倉 まな（さくらまな、1993年3月23日 - ）は、日本のAV女優。'
-        self.host = 'localhost'
-        self.port = 9999
+    @classmethod
+    def setUp(cls):
+        if six.PY3:
+            cls.test_senetence = '紗倉 まな（さくらまな、1993年3月23日 - ）は、日本のAV女優。'
+        else:
+            cls.test_senetence = u'紗倉 まな（さくらまな、1993年3月23日 - ）は、日本のAV女優。'
+
+        cls.host = 'localhost'
+        cls.port = 9999
 
     def test_jumanpp_server(self):
         """It tests jumanpp server handler"""
+        """やりたいこと
+        hogehoge = クラス
+        hogehoge.start_server()
+        hogehoge.analyze()
+        hogehoge.stop_server()
+        """
 
-        jumanpp_server_handler = sever_handler.JumanppServerHandler(
-            host=self.host,
-            port=self.port,
-            command='jumanpp')
-        jumanpp_server_handler.start_server()
+        '''
+        self.server_object = sever_handler.MultiprocessingSocketStreamServer(self.port, 5)
+        jumanpp_server_handler = sever_handler.JumanppServerHandler(command='jumanpp')
+        self.server_object.start(jumanpp_server_handler)
 
+        import time
+        time.sleep(3)
         self.jumanpp_clinet = JumanppWrapper(server=self.host, port=self.port)
-        res = self.jumanpp_clinet.call_juman_interface(self.test_senetence)
-
-
+        res = self.jumanpp_clinet.call_juman_interface(self.test_senetence)'''
 
 
 if __name__ == '__main__':

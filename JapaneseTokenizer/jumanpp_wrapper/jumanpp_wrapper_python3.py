@@ -1,10 +1,11 @@
+#! -*- coding: utf-8 -*-
 from pyknp import Jumanpp
 from pyknp import MList
 from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common import text_preprocess, juman_utils
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
-from typing import List, Dict, Tuple, Union, TypeVar
+from typing import List, Dict, Tuple, Union, TypeVar, Callable
 # timeout
 from JapaneseTokenizer.common.timeout_handler import on_timeout
 import logging
@@ -22,6 +23,9 @@ try:
     import pyknp
 except ImportError:
     logger.warning(msg='pyknp is not ready to use. Install first if you would like to use pyknp wrapper.')
+
+
+
 
 
 class JumanppClient(object):
@@ -46,7 +50,7 @@ class JumanppClient(object):
             self.sock.close()
 
     def query(self, sentence, pattern):
-        # type: (, str, bytes) -> str
+        # type: (str, bytes) -> str
         assert (isinstance(sentence, six.text_type))
         self.sock.sendall(b"%s\n" % sentence.encode('utf-8').strip())
         data = self.sock.recv(1024)
