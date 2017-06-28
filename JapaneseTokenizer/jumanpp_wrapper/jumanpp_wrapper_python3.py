@@ -29,6 +29,8 @@ class JumanppClient(object):
     def __init__(self, hostname:str, port:int, timeout:int=50, option=None):
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if isinstance(port, str):
+                port = int(port)
             self.sock.connect((hostname, port))
         except ConnectionRefusedError:
             raise Exception("There is no jumanpp server hostname={}, port={}".format(hostname, port))
@@ -59,10 +61,10 @@ class JumanppClient(object):
 class JumanppWrapper(WrapperBase):
     """Class for Juman++"""
     def __init__(self, command='jumanpp', timeout=30, pattern=r'EOS', server:str=None, port:int=12000, **args):
-        # type: (str, int, str, str) -> None
+        """"""
+        # type: (str, int, str, str)->None
         if not server is None:
             pattern = pattern.encode('utf-8')
-
 
         self.eos_pattern = pattern
         if server is None:
