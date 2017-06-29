@@ -148,8 +148,15 @@ class JumanWrapper(WrapperBase):
         if isinstance(self.juman, pyknp.Juman):
             return self.juman.analysis(input_str)
         elif isinstance(self.juman, JumanppHnadler):
-            result_analysis = self.juman.query(input_str)
+            try:
+                result_analysis = self.juman.query(input_str)
+            except UnicodeDecodeError:
+                logger.warning(msg="Process is down by some reason. It restarts process automatically.")
+                self.juman.restart_process()
+                result_analysis = self.juman.query(input_string=input_str)
             return MList(spec=result_analysis)
+        else:
+            raise Exception('Not defined.')
 
     def tokenize(self, sentence,
                  normalize=True,

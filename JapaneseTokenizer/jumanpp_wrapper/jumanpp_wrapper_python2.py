@@ -140,7 +140,12 @@ class JumanppWrapper(WrapperBase):
         if isinstance(self.jumanpp_obj, Jumanpp):
             ml_token_object = self.jumanpp_obj.analysis(input_str=input_str)
         elif isinstance(self.jumanpp_obj, JumanppHnadler):
-            result_token = self.jumanpp_obj.query(input_string=input_str)
+            try:
+                result_token = self.jumanpp_obj.query(input_string=input_str)
+            except UnicodeDecodeError:
+                logger.warning(msg="Process is down by some reason. It restarts process automatically.")
+                self.jumanpp_obj.restart_process()
+                result_token = self.jumanpp_obj.query(input_string=input_str)
             ml_token_object = MList(result_token)
         elif isinstance(self.jumanpp_obj, JumanppClient):
             server_response = self.jumanpp_obj.query(sentence=input_str, pattern=self.eos_pattern)

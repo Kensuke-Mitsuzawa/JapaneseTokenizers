@@ -115,7 +115,12 @@ class JumanWrapper(WrapperBase):
             result = self.juman.analysis(input_str)
             return result
         elif isinstance(self.juman, JumanppHnadler):
-            result_analysis = self.juman.query(input_str)
+            try:
+                result_analysis = self.juman.query(input_str)
+            except UnicodeDecodeError:
+                logger.warning(msg="Process is down by some reason. It restarts process automatically.")
+                self.juman.restart_process()
+                result_analysis = self.juman.query(input_string=input_str)
             return MList(result_analysis)
         else:
             raise Exception('Not defined.')
