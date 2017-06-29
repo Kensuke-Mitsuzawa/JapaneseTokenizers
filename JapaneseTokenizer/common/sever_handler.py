@@ -13,6 +13,7 @@ logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 import pexpect
 import shutil
 import signal
+import six
 
 '''
 class BaseServerHandler(object):
@@ -277,12 +278,13 @@ else:
 
 # todo サーバー化したいならば、このクラスを複数たてればいいんじゃない？
 class JumanppHnadler(object):
-    def __init__(self, jumanpp_command, timeout_second=10):
+    def __init__(self, jumanpp_command, pattern='EOS', timeout_second=10):
         """"""
-        # type: (str,int)->None
+        # type: (six.text_type,six.text_type,int)->None
         self.jumanpp_command = jumanpp_command
         self.launch_jumanpp_process(jumanpp_command)
         self.timeout_second = timeout_second
+        self.pattern = pattern
 
     def __del__(self):
         if hasattr(self, "process_analyzer"):
@@ -292,7 +294,7 @@ class JumanppHnadler(object):
         """* What you can do
         - It starts jumanpp process and keep it.
         """
-        # type: (str)->None
+        # type: (six.text_type)->None
         if shutil.which(command) is None:
             raise Exception("No command at {}".format(command))
         else:
@@ -325,14 +327,17 @@ class JumanppHnadler(object):
         - It takes the result of Juman++
         - This function monitors time which takes for getting the result.
         """
-        # type: (str)->str
+        # type: (six.text_type)->six.text_type
         signal.signal(signal.SIGALRM, self.__notify_handler)
         signal.alarm(self.timeout_second)
         self.process_analyzer.sendline(input_string)
         buffer = ""
         while True:
-            line_string = self.process_analyzer.readline()  # type: bytes
-            if line_string.strip() == "EOS":
+            line_string = self.process_analyzer.readline()  # type: six.text_type
+            if line_string.strip() == input_string:
+                """Skip if process returns the same input string"""
+                continue
+            elif line_string.strip() == self.pattern:
                 buffer += line_string
                 signal.alarm(0)
                 return buffer
@@ -347,7 +352,7 @@ class JumanppHnadler(object):
     def query(self, input_string):
         """* What you can do
         """
-        # type: (str)->str
+        # type: (six.text_type)->six.text_type
         if six.PY3:
             return self.__query_python3(input_string)
         else:
