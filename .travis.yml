@@ -10,9 +10,8 @@ addons:
     - curl
     - xz-utils
     - file
-    - juman
     - pandoc
-    - libboost-dev
+    - libboost-all-dev
     - language-pack-ja-base
     - language-pack-ja
     - ibus-mozc

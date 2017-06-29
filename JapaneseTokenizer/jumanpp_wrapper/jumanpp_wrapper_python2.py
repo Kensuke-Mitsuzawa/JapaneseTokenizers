@@ -1,18 +1,22 @@
+#! -*- coding: utf-8 -*-
 from pyknp import Jumanpp
 from pyknp import MList
+# modules
 from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common import text_preprocess, juman_utils
+from JapaneseTokenizer.common.sever_handler import JumanppHnadler
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
-from typing import List, Dict, Tuple, Union, TypeVar
-from future.utils import string_types, text_type
+from typing import List, Dict, Tuple, Union, TypeVar, Any, Callable
 # timeout
 from JapaneseTokenizer.common.timeout_handler import on_timeout
+from six import text_type
 import logging
 import sys
 import socket
 import six
 import re
+import os
 __author__ = 'kensuke-mi'
 
 logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
@@ -28,9 +32,11 @@ except ImportError:
 class JumanppClient(object):
     """Class for receiving data as client"""
     def __init__(self, hostname, port, timeout=50, option=None):
-        # type: (str, int, int, Dict[string_types,Any])->None
+        # type: (text_type, int, int, Dict[text_type,Any])->None
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            if isinstance(port, text_type):
+                port = int(port)
             self.sock.connect((hostname, port))
         except:
             raise Exception("There is no jumanpp server hostname={}, port={}".format(hostname, port))
@@ -58,20 +64,70 @@ class JumanppClient(object):
 
 class JumanppWrapper(WrapperBase):
     """Class for Juman++"""
-    def __init__(self, command='jumanpp', timeout=30, pattern='EOS', server=None, port=12000, **args):
-        # type: (str, int, str, str, int, Dict[str,Any]) -> None
+
+    def __init__(self,
+                 command='jumanpp',
+                 timeout=30,
+                 pattern=r'EOS',
+                 server=None,
+                 port=12000,
+                 is_use_pyknp = False,
+                 ** args):
+        """* What you can do
+        - You can select backend process of jumanpp.
+            - jumanpp-pexpect: It calls jumanpp on your local machine. It keeps jumanpp process running.
+            - jumanpp-pyknp: It calls jumanpp on your local machine. It launches jumanpp process everytime you call. Thus, this is slower than jumanpp-pexpect 
+            - jumanpp-server: It calls jumannpp on somewhere else. Keep mind, you have jumanpp sever process somewhere.
+
+        * Parameters
+        - timeout: Time to wait from jumanpp process.
+        - is_use_pyknp: bool flag to decide if you use pyknp as backend process.  If True; you use pyknp. False; you use pexpect. 
+        pexpect is much faster than you use pyknp. You can not use pexpect if you're using it on Windowns
+        - server: hostname where jumanpp is running
+        - port: port number where jumanpp is running
+        """
+        # type: (text_type,int,text_type,text_type,bool)->None
         self.eos_pattern = pattern
-        if server is None:
+        self.is_use_pyknp = is_use_pyknp
+        if not server is None:
+            pattern = pattern.encode('utf-8')
+        else:
+            pass
+
+        if os.name == 'nt':
+            """It forces to use pyknp if it runs on Windows."""
+            if not self.is_use_pyknp:
+                logger.warning(msg="You're not able to use pexpect in Windows. It forced to set is_use_pyknp = True")
+            else:
+                pass
+            self.is_use_pyknp = True
+        else:
+            pass
+
+        if server is None and self.is_use_pyknp:
+            # jumanpp-pexpect #
             self.jumanpp_obj = Jumanpp(
                 command=command,
                 timeout=timeout,
                 pattern=pattern,
                 **args)
+        elif server is None:
+            # jumanpp-pexpect #
+            self.jumanpp_obj = JumanppHnadler(jumanpp_command=command, timeout_second=timeout, pattern=pattern)
         else:
+            # jumanpp-server #
             self.jumanpp_obj = JumanppClient(hostname=server, port=port, timeout=timeout)
 
     def __del__(self):
-        del self.jumanpp_obj
+        if hasattr(self, "jumanpp_obj"):
+            if isinstance(self.jumanpp_obj, JumanppClient):
+                self.jumanpp_obj.sock.close()
+            elif isinstance(self.jumanpp_obj, JumanppHnadler):
+                self.jumanpp_obj.stop_process()
+            else:
+                del self.jumanpp_obj
+        else:
+            pass
 
     def call_juman_interface(self, input_str):
         # type: (unicode) -> MList
@@ -83,6 +139,9 @@ class JumanppWrapper(WrapperBase):
         """
         if isinstance(self.jumanpp_obj, Jumanpp):
             ml_token_object = self.jumanpp_obj.analysis(input_str=input_str)
+        elif isinstance(self.jumanpp_obj, JumanppHnadler):
+            result_token = self.jumanpp_obj.query(input_string=input_str)
+            ml_token_object = MList(result_token)
         elif isinstance(self.jumanpp_obj, JumanppClient):
             server_response = self.jumanpp_obj.query(sentence=input_str, pattern=self.eos_pattern)
             ml_token_object = MList(server_response)
