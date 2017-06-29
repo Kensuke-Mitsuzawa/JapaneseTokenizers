@@ -17,8 +17,8 @@ logger.level = logging.DEBUG
 class TestJumanppWrapperPython3(unittest.TestCase):
     def setUp(self):
         # this is under MacOSX10
-        self.path_to_juman_command = '/usr/local/bin/juman'
-        if not os.path.exists(self.path_to_juman_command): self.path_to_juman_command = 'juman'
+        self.path_to_juman_command = '/usr/local/bin/jumanpp'
+        if not os.path.exists(self.path_to_juman_command): self.path_to_juman_command = 'jumanpp'
 
     def test_JumanppClient(self):
         test_sentence = '外国人参政権を欲しい。'
