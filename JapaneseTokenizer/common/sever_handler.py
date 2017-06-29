@@ -10,8 +10,9 @@ from JapaneseTokenizer import init_logger
 import logging
 logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 # else
-import time
+import pexpect
 import shutil
+import signal
 
 '''
 class BaseServerHandler(object):
@@ -271,22 +272,21 @@ else:
                         '''
 
 
-import pexpect
-import shutil
-from functools import wraps
 
 
 
 # todo サーバー化したいならば、このクラスを複数たてればいいんじゃない？
 class JumanppHnadler(object):
-    def __init__(self, jumanpp_command):
+    def __init__(self, jumanpp_command, timeout_second=10):
         """"""
-        # type: (str)->None
+        # type: (str,int)->None
         self.jumanpp_command = jumanpp_command
         self.launch_jumanpp_process(jumanpp_command)
+        self.timeout_second = timeout_second
 
     def __del__(self):
-        self.process_analyzer.kill(sig=9)
+        if hasattr(self, "process_analyzer"):
+            self.process_analyzer.kill(sig=9)
 
     def launch_jumanpp_process(self, command):
         """* What you can do
@@ -299,24 +299,50 @@ class JumanppHnadler(object):
             self.process_analyzer = pexpect.spawnu(command)
             self.process_id = self.process_analyzer.pid
 
-    def restart_process(self, message=None):
+    def restart_process(self):
+        """"""
+        # type: ()->None
         self.process_analyzer.kill(sig=9)
         self.process_analyzer = pexpect.spawnu(self.jumanpp_command)
         self.process_id = self.process_analyzer.pid
 
 
+    def stop_process(self):
+        """* What you can do
+        - You're able to stop the process which this instance has now.
+        """
+        # type: ()->bool
+        if hasattr(self, "process_analyzer"):
+            self.process_analyzer.kill(sig=9)
+        else:
+            pass
+
+        return True
+
+
     def __query_python3(self, input_string):
-        """"""
+        """* What you can do
+        - It takes the result of Juman++
+        - This function monitors time which takes for getting the result.
+        """
         # type: (str)->str
+        signal.signal(signal.SIGALRM, self.__notify_handler)
+        signal.alarm(self.timeout_second)
         self.process_analyzer.sendline(input_string)
         buffer = ""
         while True:
             line_string = self.process_analyzer.readline()  # type: bytes
             if line_string.strip() == "EOS":
                 buffer += line_string
+                signal.alarm(0)
                 return buffer
             else:
                 buffer += line_string
+
+    def __notify_handler(self, signum, frame):
+        raise Exception("""It takes longer time than {time} seconds. You're able to try, 
+        1. Change your setting of 'timeout_second' parameter
+        2. Run restart_process() method when the exception happens.""".format(**{"time": self.timeout_second}))
 
     def query(self, input_string):
         """* What you can do
@@ -325,11 +351,4 @@ class JumanppHnadler(object):
         if six.PY3:
             return self.__query_python3(input_string)
         else:
-            pass
-
-
-if __name__ == "__main__":
-    jumanpp_handler = JumanppHnadler('/usr/local/bin/jumanpp')
-    for i in range(0, 100):
-        a = jumanpp_handler.query('紗倉 まな（さくらまな、1993年3月23日 - ）は、日本のAV女優。'*10)
-        print(a)
+            raise NotImplementedError("Not ready for Python2 yet.")
