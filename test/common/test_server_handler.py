@@ -33,7 +33,7 @@ class TestServerHandler(unittest.TestCase):
         # normal test #
         jumanpp_process_handler = sever_handler.JumanppHnadler(jumanpp_command=self.jumanpp_command)
         result_jumanpp_analysis = jumanpp_process_handler.query(input_string=self.test_senetence)
-        self.assertTrue(isinstance(result_jumanpp_analysis,str))
+        self.assertTrue(isinstance(result_jumanpp_analysis,six.text_type))
         ## stop process ##
         jumanpp_process_handler.stop_process()
         ## delete instance ##

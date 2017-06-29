@@ -1,5 +1,4 @@
 #! -*- coding: utf-8 -*-
-import six
 import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import multiprocessing
@@ -10,10 +9,12 @@ from JapaneseTokenizer import init_logger
 import logging
 logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 # else
+from six import text_type
+import six
 import pexpect
 import shutil
 import signal
-import six
+import os
 
 '''
 class BaseServerHandler(object):
@@ -280,7 +281,7 @@ else:
 class JumanppHnadler(object):
     def __init__(self, jumanpp_command, pattern='EOS', timeout_second=10):
         """"""
-        # type: (six.text_type,six.text_type,int)->None
+        # type: (text_type,text_type,int)->None
         self.jumanpp_command = jumanpp_command
         self.launch_jumanpp_process(jumanpp_command)
         self.timeout_second = timeout_second
@@ -294,12 +295,22 @@ class JumanppHnadler(object):
         """* What you can do
         - It starts jumanpp process and keep it.
         """
-        # type: (six.text_type)->None
-        if shutil.which(command) is None:
-            raise Exception("No command at {}".format(command))
+        # type: (text_type)->None
+        if six.PY3:
+            if shutil.which(command) is None:
+                raise Exception("No command at {}".format(command))
+            else:
+                self.process_analyzer = pexpect.spawnu(command)
+                self.process_id = self.process_analyzer.pid
         else:
-            self.process_analyzer = pexpect.spawnu(command)
-            self.process_id = self.process_analyzer.pid
+            doc_command_string = "echo '' | {}".format(command)
+            command_check = os.system(doc_command_string)
+            if not command_check == 0:
+                raise Exception("No command at {}".format(command))
+            else:
+                self.process_analyzer = pexpect.spawnu(command)
+                self.process_id = self.process_analyzer.pid
+
 
     def restart_process(self):
         """"""
@@ -322,18 +333,18 @@ class JumanppHnadler(object):
         return True
 
 
-    def __query_python3(self, input_string):
+    def __query(self, input_string):
         """* What you can do
         - It takes the result of Juman++
         - This function monitors time which takes for getting the result.
         """
-        # type: (six.text_type)->six.text_type
+        # type: (text_type)->text_type
         signal.signal(signal.SIGALRM, self.__notify_handler)
         signal.alarm(self.timeout_second)
         self.process_analyzer.sendline(input_string)
         buffer = ""
         while True:
-            line_string = self.process_analyzer.readline()  # type: six.text_type
+            line_string = self.process_analyzer.readline()  # type: text_type
             if line_string.strip() == input_string:
                 """Skip if process returns the same input string"""
                 continue
@@ -352,8 +363,5 @@ class JumanppHnadler(object):
     def query(self, input_string):
         """* What you can do
         """
-        # type: (six.text_type)->six.text_type
-        if six.PY3:
-            return self.__query_python3(input_string)
-        else:
-            raise NotImplementedError("Not ready for Python2 yet.")
+        # type: (text_type)->text_type
+        return self.__query(input_string=input_string)

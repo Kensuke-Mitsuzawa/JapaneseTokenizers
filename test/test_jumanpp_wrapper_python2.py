@@ -4,6 +4,7 @@
 from pyknp import Juman
 from JapaneseTokenizer.datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
 from JapaneseTokenizer.jumanpp_wrapper.jumanpp_wrapper_python2 import JumanppWrapper, JumanppClient
+from JapaneseTokenizer.common.sever_handler import JumanppHnadler
 import pyknp
 import unittest
 import os
@@ -53,13 +54,15 @@ class TestJumanppWrapperPython2(unittest.TestCase):
         del jumanpp_tokenizer
 
 
-    def test_jumanpp_localmode(self):
+    def test_jumanpp_localmode_pyexpect(self):
         test_sentence = u'外国人参政権を欲しい。'
-        jumanpp_tokenizer = JumanppWrapper()
+        jumanpp_tokenizer = JumanppWrapper(is_use_pyknp=False)
+        self.assertTrue(isinstance(jumanpp_tokenizer.jumanpp_obj, JumanppHnadler))
         list_tokens = jumanpp_tokenizer.tokenize(sentence=test_sentence, return_list=True)
         assert isinstance(list_tokens, list)
 
-        jumanpp_tokenizer = JumanppWrapper()
+        jumanpp_tokenizer = JumanppWrapper(is_use_pyknp=False)
+        self.assertTrue(isinstance(jumanpp_tokenizer.jumanpp_obj, JumanppHnadler))
         tokenized_obj = jumanpp_tokenizer.tokenize(sentence=test_sentence, return_list=False)
         assert isinstance(tokenized_obj, TokenizedSenetence)
 

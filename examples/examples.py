@@ -10,6 +10,7 @@ from JapaneseTokenizer import KyteaWrapper
 from JapaneseTokenizer.datamodels import TokenizedResult
 from JapaneseTokenizer import init_logger
 import logging
+import socket
 logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 __author__ = 'kensuke-mi'
 
@@ -107,10 +108,17 @@ def basic_example_juman_2x():
             token_object.tuple_pos))
 
     ### You can call juman with server mode. You must start JUMAN as server mode beforehand ###
-    juman_wrapper = JumanWrapper(server='localhost', port=32000)
-    tokens_list = juman_wrapper.tokenize(sentence=sentence, return_list=True)
-    assert isinstance(tokens_list, list)
-
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    HOST='localhost'
+    PORT = 32000
+    try:
+        s.connect((HOST, PORT))
+        s.close()
+        juman_wrapper = JumanWrapper(server=HOST, port=PORT)
+        tokens_list = juman_wrapper.tokenize(sentence=sentence, return_list=True)
+        assert isinstance(tokens_list, list)
+    except:
+        logger.info(msg='Juman server is not running. Skip it.')
 
     # filtering is same as mecab
     filtered_result = JumanWrapper().tokenize(sentence, return_list=False).filter(pos_condition=[(u'名詞',)]).convert_list_object()
@@ -139,15 +147,24 @@ def basic_example_jumanpp_2x():
             token_object.tuple_pos))
 
     ### You can call juman with server mode. You must start JUMAN as server mode beforehand ###
-    jumanpp_wrapper = JumanppWrapper(server='localhost', port=12000)
-    tokens_list = jumanpp_wrapper.tokenize(sentence=sentence, return_list=True)
-    assert isinstance(tokens_list, list)
-    ### Attention: Please delete instance object of sever mode when you finished using it ###
-    del jumanpp_wrapper
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    HOST='localhost'
+    PORT = 12000
+    try:
+        s.connect((HOST, PORT))
+        s.close()
+        jumanpp_wrapper = JumanppWrapper(server=HOST, port=PORT)
+        tokens_list = jumanpp_wrapper.tokenize(sentence=sentence, return_list=True)
+        assert isinstance(tokens_list, list)
+        ### Attention: Please delete instance object of sever mode when you finished using it ###
+        del jumanpp_wrapper
+        # filtering is same as mecab
+        filtered_result = JumanppWrapper(server=HOST, port=PORT).tokenize(sentence, return_list=False).filter(
+            pos_condition=[(u'名詞',)]).convert_list_object()
+        assert isinstance(filtered_result, list)
+    except:
+        logger.info(msg='Juman++ server is not running. Skip it.')
 
-    # filtering is same as mecab
-    filtered_result = JumanppWrapper(server='localhost', port=12000).tokenize(sentence, return_list=False).filter(pos_condition=[(u'名詞',)]).convert_list_object()
-    assert isinstance(filtered_result, list)
 
 
 def basic_example_kytea_2x():
@@ -277,27 +294,28 @@ def basic_example_juman_3x():
             token_object.tuple_pos))
 
     ### You can call juman with server mode. You must start JUMAN as server mode beforehand ###
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    HOST='localhost'
+    PORT = 32000
     try:
-        juman_wrapper = JumanWrapper(server='localhost', port=32000)
+        s.connect((HOST, PORT))
+        s.close()
+        juman_wrapper = JumanWrapper(server=HOST, port=PORT)
         tokens_list = juman_wrapper.tokenize(sentence=sentence, return_list=True)
         assert isinstance(tokens_list, list)
-    except ConnectionRefusedError:
-        logger.error(msg='Juman server is not ready.')
-
-    # filtering is same as mecab
-    try:
+        # filtering is same as mecab
         filtered_result = JumanWrapper(server='localhost', port=32000).tokenize(sentence, return_list=False).filter(pos_condition=[('名詞',)]).convert_list_object()
         assert isinstance(filtered_result, list)
         print(filtered_result)
-    except ConnectionRefusedError:
-        logger.error(msg='Juman server is not ready.')
+    except:
+        logger.info(msg='Juman server is not running. Skip it.')
 
 
 def basic_example_jumanpp_3x():
     # input is `unicode` type(in python3x)
     sentence = 'テヘランは、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
 
-    jumanpp_wrapper = JumanppWrapper()
+    jumanpp_wrapper = JumanppWrapper(is_use_pyknp=False)
     tokenized_objects = jumanpp_wrapper.tokenize(
         sentence=sentence,
         normalize=True,
@@ -315,17 +333,23 @@ def basic_example_jumanpp_3x():
             token_object.tuple_pos))
 
     ### You can call juman with server mode. You must start JUMAN as server mode beforehand ###
-    jumanpp_wrapper = JumanppWrapper(server='localhost', port=12000)
-    tokens_list = jumanpp_wrapper.tokenize(sentence=sentence, return_list=True)
-    assert isinstance(tokens_list, list)
-    ### Attention: Please delete instance object of sever mode when you finished using it ###
-    del jumanpp_wrapper
-
-    # filtering is same as mecab
-    filtered_result = JumanppWrapper(server='localhost', port=12000).tokenize(sentence, return_list=False).filter(
-        pos_condition=[('名詞',)]).convert_list_object()
-    assert isinstance(filtered_result, list)
-    print(filtered_result)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    HOST='localhost'
+    PORT = 12000
+    try:
+        s.connect((HOST, PORT))
+        s.close()
+        jumanpp_wrapper = JumanppWrapper(server=HOST, port=PORT)
+        tokens_list = jumanpp_wrapper.tokenize(sentence=sentence, return_list=True)
+        assert isinstance(tokens_list, list)
+        ### Attention: Please delete instance object of sever mode when you finished using it ###
+        del jumanpp_wrapper
+        # filtering is same as mecab
+        filtered_result = JumanppWrapper(server=HOST, port=PORT).tokenize(sentence, return_list=False).filter(
+            pos_condition=[(u'名詞',)]).convert_list_object()
+        assert isinstance(filtered_result, list)
+    except:
+        logger.info(msg='Juman++ server is not running. Skip it.')
 
 
 def basic_example_kytea_3x():

@@ -73,8 +73,8 @@ class JumanppWrapper(WrapperBase):
                  command='jumanpp',
                  timeout=30,
                  pattern=r'EOS',
-                 server:str=None,
-                 port:int=12000,
+                 server=None,
+                 port=12000,
                  is_use_pyknp=False,
                  **args):
         """* What you can do

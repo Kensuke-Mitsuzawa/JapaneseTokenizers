@@ -41,12 +41,12 @@ except ImportError:
 
 if python_version >= (3, 0, 0):
     logger.info(msg='python={}'.format(python_version))
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'neologdn', 'python-daemon']
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'neologdn', 'pexpect']
 else:
     logger.info(msg='python={}'.format(python_version))
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'neologdn', 'python-daemon']
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'neologdn', 'pexpect']
 
-version = '1.3.0'
+version = '1.3.1a'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
