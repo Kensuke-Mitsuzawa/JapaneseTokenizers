@@ -12,6 +12,9 @@ if [ `uname` = "Darwin" ]; then
 elif [ `uname` = "Linux" ]; then
     #Linux用のコード
     juman_utils_bin="/usr/local/libexec/juman/"
+else
+    echo "Your platform ($(uname -a)) is not supported."
+    exit 1
 fi
 
 WORK_DIR=`pwd`
@@ -32,6 +35,8 @@ if [ $is_mecab_install -eq 127 ]; then
     wget -O mecab-ipadic-2.7.0-20070801.tar.gz "https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7MWVlSDBCSXZMTXM"
     tar zxvf mecab-ipadic-2.7.0-20070801.tar.gz
     cd mecab-ipadic-2.7.0-20070801 &&./configure --with-charset=utf8 && make && make install
+    # 動作テスト
+    echo 'インストール後のテスト' | mecab
 else
     :
 fi
@@ -47,6 +52,8 @@ if [ $is_juman_install -eq 127 ]; then
 
     # インストール後のldconfig
     ldconfig
+    # 動作テスト
+    echo 'インストール後のテスト' | juman
 else
     :
 fi
@@ -63,6 +70,8 @@ if [ $is_jumanpp_install -eq 127 ]; then
 
     # インストール後のldconfig
     ldconfig
+    # 動作テスト
+    echo 'インストール後のテスト' | jumanpp
 else
     :
 fi
@@ -78,6 +87,8 @@ if [ $is_kytea_install -eq 127 ]; then
     cd kytea-0.4.7 && ./configure && make && make install
     # インストール後のldconfig
     ldconfig
+    # 動作テスト
+    echo 'インストール後のテスト' | kytea
 else
     :
 fi
