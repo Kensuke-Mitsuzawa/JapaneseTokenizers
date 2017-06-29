@@ -12,6 +12,7 @@ addons:
     - file
     - pandoc
     - libboost-dev
+    - libboost-all-dev
     - language-pack-ja-base
     - language-pack-ja
     - ibus-mozc
