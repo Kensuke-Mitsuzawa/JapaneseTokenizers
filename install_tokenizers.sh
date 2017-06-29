@@ -12,6 +12,9 @@ if [ `uname` = "Darwin" ]; then
 elif [ `uname` = "Linux" ]; then
     #Linux用のコード
     juman_utils_bin="/usr/local/libexec/juman/"
+else
+    echo "Your platform ($(uname -a)) is not supported."
+    exit 1
 fi
 
 WORK_DIR=`pwd`

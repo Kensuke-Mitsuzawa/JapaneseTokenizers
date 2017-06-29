@@ -12,7 +12,6 @@ import sys
 import unittest
 import os
 import time
-import daemon
 
 __author__ = 'kensuke-mi'
 
