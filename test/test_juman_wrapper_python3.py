@@ -35,14 +35,12 @@ class TestJumanWrapperPython3(unittest.TestCase):
     def test_tokenize(self):
         """This test case checks juman_wrapper.tokenize
         """
-
         logger.debug('Tokenize Test')
         test_sentence = "紗倉 まな（さくら まな、1993年3月23日 - ）は、日本のAV女優。"
         juman_wrapper = JumanWrapper(command=self.path_to_juman_command)
         token_objects = juman_wrapper.tokenize(sentence=test_sentence,
                                                return_list=False,
-                                               is_feature=True
-                                               )
+                                               is_feature=True)
 
         assert isinstance(token_objects, TokenizedSenetence)
         for t_obj in token_objects.tokenized_objects:
@@ -71,7 +69,7 @@ class TestJumanWrapperPython3(unittest.TestCase):
             logger.debug('word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple)))
 
     def test_filter_pos(self):
-        """
+        """POS filteringのテスト
         """
         logger.debug('Filtering Test. POS condition is only 名詞')
         test_sentence = "紗倉 まな（さくら まな、1993年3月23日 - ）は、日本のAV女優。"
@@ -112,6 +110,7 @@ class TestJumanWrapperPython3(unittest.TestCase):
             logger.debug('word_stem:{} word_pos:{}'.format(word_stem, ' '.join(word_posTuple)))
 
     def test_stopwords(self):
+        """stopword除去のテスト"""
         stopword = ['ＡＶ', '女優']
         logger.debug ('Stopwords Filtering Test. Stopwords is {}'.format(','.join(stopword)))
         test_sentence = "紗倉 まな（さくら まな、1993年3月23日 - ）は、日本のAV女優。"

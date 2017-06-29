@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+# package module
 from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer import init_logger
-from typing import List, Union, Any
-from future.utils import string_types
+from JapaneseTokenizer.common.sever_handler import JumanppHnadler
+# else
+from typing import List, Union, Any, Callable, Tuple
+from six import text_type
 from pyknp import MList
 import logging
 import sys
@@ -30,17 +33,50 @@ class JumanWrapper(WrapperBase):
                  rcfile=None,
                  option='-e2 -B',
                  pattern='EOS',
+                 is_use_pyknp=False,
                  **args):
-        # type: (str, str, int, int)->None
-        if not rcfile is None and not os.path.exists(rcfile): raise Exception(
-            'rcfile does not exist at {}'.format(rcfile))
-        if server is None:
-            server = None
+        """* Class to call Juman tokenizer
+        """
+        # type: (text_type,Union[str,None],int,int,text_type,Union[bytes,str],Union[bytes,str],bool)->None
+
+        self.timeout = timeout
+        self.pattern = pattern
+        self.option = option
+        self.command = command
+        if not rcfile is None and not os.path.exists(rcfile):
+            raise FileExistsError('rcfile does not exist at {}'.format(rcfile))
+        if not server is None:
+            ### It converts from str into bytes only for sever mode ###
+            self.option = self.option.encode('utf-8')
+            self.pattern = self.pattern.encode('utf-8')
         else:
-            server = server
+            pass
 
-        self.juman = pyknp.Juman(command=command, server=server, port=port, timeout=timeout, option=option, pattern=pattern, **args)
+        # check os #
+        if os.name == 'nt':
+            if not is_use_pyknp:
+                logger.warning(msg='It forces is_use_pyknp = True on Windows.')
+            else:
+                pass
+            self.is_use_pyknp = True
+        else:
+            pass
 
+
+        if is_use_pyknp:
+            self.juman = pyknp.Juman(command=command, server=server, port=port,
+                                     timeout=self.timeout, rcfile=rcfile, option=option,
+                                     pattern=pattern, **args)
+        else:
+            self.juman = JumanppHnadler(jumanpp_command=command,
+                                        option=self.option,
+                                        pattern=self.pattern,
+                                        timeout_second=self.timeout)
+
+    def __del__(self):
+        if hasattr(self, "juman"):
+            if isinstance(self.juman, JumanppHnadler):
+                self.juman.stop_process()
 
     def __extract_morphological_information(self, mrph_object, is_feature, is_surface):
         """This method extracts morphlogical information from token object.
@@ -75,8 +111,14 @@ class JumanWrapper(WrapperBase):
 
     def call_juman_interface(self, input_str):
         # type: (str)->MList
-        result = self.juman.analysis(input_str)
-        return result
+        if isinstance(self.juman, pyknp.Juman):
+            result = self.juman.analysis(input_str)
+            return result
+        elif isinstance(self.juman, JumanppHnadler):
+            result_analysis = self.juman.query(input_str)
+            return MList(result_analysis)
+        else:
+            raise Exception('Not defined.')
 
     def tokenize(self,
                  sentence,
@@ -91,7 +133,7 @@ class JumanWrapper(WrapperBase):
         If return_list==False, this method returns TokenizedSenetence object.
         """
         assert isinstance(normalize, bool)
-        assert isinstance(sentence, string_types)
+        assert isinstance(sentence, text_type)
         normalized_sentence = func_normalizer(sentence)
         result = self.call_juman_interface(normalized_sentence)
 

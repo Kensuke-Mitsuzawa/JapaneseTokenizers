@@ -279,13 +279,18 @@ else:
 
 # todo サーバー化したいならば、このクラスを複数たてればいいんじゃない？
 class JumanppHnadler(object):
-    def __init__(self, jumanpp_command, pattern='EOS', timeout_second=10):
+    def __init__(self,
+                 jumanpp_command,
+                 option=None,
+                 pattern='EOS',
+                 timeout_second=10):
         """"""
-        # type: (text_type,text_type,int)->None
+        # type: (text_type,text_type,text_type,int)->None
         self.jumanpp_command = jumanpp_command
-        self.launch_jumanpp_process(jumanpp_command)
         self.timeout_second = timeout_second
         self.pattern = pattern
+        self.option = option
+        self.launch_jumanpp_process(jumanpp_command)
 
     def __del__(self):
         if hasattr(self, "process_analyzer"):
@@ -296,11 +301,16 @@ class JumanppHnadler(object):
         - It starts jumanpp process and keep it.
         """
         # type: (text_type)->None
+        if not self.option is None:
+            command_plus_option = self.jumanpp_command + " " + self.option
+        else:
+            command_plus_option = self.jumanpp_command
+
         if six.PY3:
             if shutil.which(command) is None:
                 raise Exception("No command at {}".format(command))
             else:
-                self.process_analyzer = pexpect.spawnu(command)
+                self.process_analyzer = pexpect.spawnu(command_plus_option)
                 self.process_id = self.process_analyzer.pid
         else:
             doc_command_string = "echo '' | {}".format(command)
@@ -308,15 +318,20 @@ class JumanppHnadler(object):
             if not command_check == 0:
                 raise Exception("No command at {}".format(command))
             else:
-                self.process_analyzer = pexpect.spawnu(command)
+                self.process_analyzer = pexpect.spawnu(command_plus_option)
                 self.process_id = self.process_analyzer.pid
 
 
     def restart_process(self):
         """"""
         # type: ()->None
+        if not self.option is None:
+            command_plus_option = self.jumanpp_command + " " + self.option
+        else:
+            command_plus_option = self.jumanpp_command
+
         self.process_analyzer.kill(sig=9)
-        self.process_analyzer = pexpect.spawnu(self.jumanpp_command)
+        self.process_analyzer = pexpect.spawnu(command_plus_option)
         self.process_id = self.process_analyzer.pid
 
 
