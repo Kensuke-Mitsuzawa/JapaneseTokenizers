@@ -48,14 +48,19 @@ class MonkeyPatchSocket(object):
             self.sock.close()
 
     def query(self, sentence, pattern):
+        """"""
+        # type: (str,str)->str
         assert(isinstance(sentence, six.text_type))
-        self.sock.sendall(b"%s\n" % sentence.encode('utf-8').strip())
+        sentence_bytes = sentence.encode('utf-8').strip()
+        pattern_bytes = pattern.encode('utf-8')
+
+        self.sock.sendall(sentence_bytes + b"\n")
         data = self.sock.recv(1024)
         assert isinstance(data, bytes)
         recv = data
-        while not re.search(pattern, recv):
+        while not re.search(pattern_bytes, recv):
             data = self.sock.recv(1024)
-            recv = b"%s%s" % (recv, data)
+            recv = recv + data
         return recv.strip().decode('utf-8')
 
 
@@ -98,7 +103,7 @@ class JumanWrapper(WrapperBase):
             pass
 
 
-        if is_use_pyknp:
+        if is_use_pyknp or not server is None:
             self.juman = pyknp.Juman(command=command, server=server, port=port,
                                      timeout=self.timeout, rcfile=rcfile, option=option,
                                      pattern=pattern, **args)
