@@ -1,8 +1,13 @@
+#! -*- coding: utf-8 -*-
+# package modules
 from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common import text_preprocess, juman_utils
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
-from typing import List, Union, TypeVar, Tuple
+# pyknp modules
+from pyknp.juman.mlist import MList
+# else
+from typing import List, Union, TypeVar, Tuple, Callable
 import logging
 import sys
 import socket
