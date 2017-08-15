@@ -196,7 +196,7 @@ class MecabWrapper(WrapperBase):
         assert isinstance(is_surface, bool)
 
 
-        surface, features = analyzed_line.split('\t')
+        surface, features = analyzed_line.split('\t', 1)
         tuple_pos, word_stem = self.__feature_parser(features, surface)
         tokenized_obj = TokenizedResult(
             node_obj=None,
