@@ -16,27 +16,15 @@ class TestFilter(unittest.TestCase):
         self.path_user_dict = os.path.join(os.path.dirname(__file__), 'resources/test/userdict.csv')
 
     def test_filtering(self):
-        mecab_obj = MecabWrapper(
-            dictType='ipadic'
-        )
-        tokenized_sentence = mecab_obj.tokenize(
-            sentence=self.test_senetence,
-            is_feature=True,
-            return_list=False
-        )
+        mecab_obj = MecabWrapper(dictType='ipadic')
+        tokenized_sentence = mecab_obj.tokenize(sentence=self.test_senetence,is_feature=True).\
+            filter(pos_condition=self.pos_condition, stopwords=self.stopword)
         assert isinstance(tokenized_sentence, TokenizedSenetence)
-
-        filtered_obj = mecab_obj.filter(
-            parsed_sentence=tokenized_sentence,
-            pos_condition=self.pos_condition,
-            stopwords=self.stopword
-        )
-        assert isinstance(filtered_obj, FilteredObject)
 
         seq_except_pos = [('動詞',), ('名詞', '代名詞'), ('名詞', '接尾')]
         seq_match_pos = [('名詞',), ('名詞', '固有名詞',), ('形容詞',), ('形容詞', '自立'),('助詞', '格助詞', '引用')]
 
-        for token_obj in filtered_obj.tokenized_objects:
+        for token_obj in tokenized_sentence.tokenized_objects:
             assert isinstance(token_obj, TokenizedResult)
 
             pos_tuple = token_obj.tuple_pos

@@ -1,6 +1,9 @@
 #! -*- coding: utf-8 -*-
-from JapaneseTokenizer.common.text_preprocess import denormalize_text
+# normalize module #
+from JapaneseTokenizer.common.text_preprocess import normalize_text, denormalize_text
+# datemodels #
 from MeCab import Node
+# typing #
 from typing import List, Union, Any, Tuple, Dict, Callable
 from future.utils import string_types, text_type
 import sys
@@ -211,7 +214,11 @@ class TokenizedSenetence(object):
 
         return [self.__convert_string_type(p_c_tuple) for p_c_tuple in pos_condistion]
 
-    def filter(self, pos_condition=None, stopwords=None):
+    def filter(self,
+               pos_condition=None,
+               stopwords=None,
+               is_normalize=True,
+               func_normalizer=normalize_text):
         """* What you can do
         - It filters out token which does NOT meet the conditions (stopwords & part-of-speech tag)
         - Under python2.x, pos_condition & stopwords are converted into unicode type.
@@ -223,12 +230,14 @@ class TokenizedSenetence(object):
             - For example, in mecab you can take words with 名詞 if ('名詞',)
             - For example, in mecab you can take words with 名詞-固有名詞 if ('名詞', '固有名詞')
         - stopwords: list of word which you would like to remove
+        - is_normalize: Boolean flag for normalize stopwords.
+        - func_normalizer: Function object for normalization. The function object must be the same one as when you use tokenize.
 
         * Example
         >>> pos_condition = [('名詞', '一般'), ('形容詞', '自立'), ('助詞', '格助詞', '一般')]
         >>> stopwords = ['これ', 'それ']
         """
-        # type: (List[Tuple[string_types,...]], List[string_types])->FilteredObject
+        # type: (List[Tuple[string_types,...]], List[string_types], bool, Callable[[string_types], string_types])->FilteredObject
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
@@ -236,9 +245,16 @@ class TokenizedSenetence(object):
             s_words = []
         elif six.PY2 and all((isinstance(s, str) for s in stopwords)):
             """under python2.x, from str into unicode"""
-            s_words = [s.decode(self.string_encoding) for s in stopwords]
+            if is_normalize:
+                s_words = [func_normalizer(s.decode(self.string_encoding)) for s in stopwords]
+            else:
+                s_words = [s.decode(self.string_encoding) for s in stopwords]
         else:
-            s_words = stopwords
+            if is_normalize:
+                s_words = [func_normalizer(s) for s in stopwords]
+            else:
+                s_words = stopwords
+
 
         if pos_condition is None:
             p_condition = []
