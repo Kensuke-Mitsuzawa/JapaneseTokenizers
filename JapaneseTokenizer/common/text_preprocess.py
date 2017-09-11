@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
+from six import string_types
 import jaconv
 import six
 import re
@@ -49,7 +50,7 @@ def normalize_text(input_text,
     * Params
     - new_line_replaced: a string which replaces from \n string.
     """
-    # type: (str,str,str,bool,bool,bool,bool)->str
+    # type: (string_types,string_types,string_types,bool,bool,bool,bool)->string_types
     if is_replace_eos:
         without_new_line = input_text.replace('\n', new_line_replaced)
     else:

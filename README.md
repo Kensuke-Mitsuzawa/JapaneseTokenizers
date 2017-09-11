@@ -33,15 +33,15 @@ See [english documentation](https://github.com/jordwest/mecab-docs-en) for detai
 
 ### Juman
 
-[Juman](http://nlp.ist.i.kyoto-u.ac.jp/EN/index.php?JUMAN) is tokenizer tool developped by Kurohashi laboratory, Kyoto University, Japan.
+[Juman](http://nlp.ist.i.kyoto-u.ac.jp/EN/index.php?JUMAN) is a tokenizer system developed by Kurohashi laboratory, Kyoto University, Japan.
 
-Juman is strong for ambigious writing style in Japanese, and is strong for new-comming words thanks to Web based huge dictionary.
+Juman is strong for ambiguous writing style in Japanese, and is strong for new-comming words thanks to Web based huge dictionary.
  
 And, Juman tells you semantic meaning of words.
 
 ### Juman++
 
-[Juman++](http://nlp.ist.i.kyoto-u.ac.jp/EN/index.php?JUMAN++) is tokenizer  developped by Kurohashi laboratory, Kyoto University, Japan.
+[Juman++](http://nlp.ist.i.kyoto-u.ac.jp/EN/index.php?JUMAN++) is a tokenizer system developed by Kurohashi laboratory, Kyoto University, Japan.
 
 Juman++ is succeeding system of Juman. It adopts RNN model for tokenization.
 
@@ -89,12 +89,14 @@ See [here](https://github.com/neologd/mecab-ipadic-neologd) and install mecab-ne
 
 ### Juman
 
-    wget -O juman7.0.1.tar.bz2 "http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/juman/juman-7.01.tar.bz2&name=juman-7.01.tar.bz2"
-    bzip2 -dc juman7.0.1.tar.bz2  | tar xvf -
-    cd juman-7.01
-    ./configure
-    make   
-    [sudo] make install
+```
+wget -O juman7.0.1.tar.bz2 "http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://nlp.ist.i.kyoto-u.ac.jp/nl-resource/juman/juman-7.01.tar.bz2&name=juman-7.01.tar.bz2"
+bzip2 -dc juman7.0.1.tar.bz2  | tar xvf -
+cd juman-7.01
+./configure
+make   
+[sudo] make install
+```    
     
 
 ## Juman++
@@ -102,9 +104,9 @@ See [here](https://github.com/neologd/mecab-ipadic-neologd) and install mecab-ne
 * GCC version must be >= 5
 
 ```
-wget http://lotus.kuee.kyoto-u.ac.jp/nl-resource/jumanpp/jumanpp-1.01.tar.xz
-tar xJvf jumanpp-1.01.tar.xz
-cd jumanpp-1.01/
+wget http://lotus.kuee.kyoto-u.ac.jp/nl-resource/jumanpp/jumanpp-1.02.tar.xz
+tar xJvf jumanpp-1.02.tar.xz
+cd jumanpp-1.02/
 ./configure
 make
 [sudo] make install
@@ -114,18 +116,22 @@ make
 
 Install Kytea system
 
-    wget http://www.phontron.com/kytea/download/kytea-0.4.7.tar.gz
-    tar -xvf kytea-0.4.7.tar
-    cd kytea-0.4.7
-    ./configure
-    make
-    make install
+```
+wget http://www.phontron.com/kytea/download/kytea-0.4.7.tar.gz
+tar -xvf kytea-0.4.7.tar
+cd kytea-0.4.7
+./configure
+make
+make install
+```    
 
 
 Kytea has [python wrapper](https://github.com/chezou/Mykytea-python) thanks to michiaki ariga.
 Install Kytea-python wrapper
 
-    pip install kytea
+```
+pip install kytea
+```
     
 
 ## install
@@ -142,48 +148,30 @@ if you see these messages, try to re-install these packages manually.
 
 # Usage
 
-Tokenization Example(For python2x. To see exmaple code for Python3.x, plaese see [here](https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers/blob/master/examples/examples.py))
+Tokenization Example(For python3.x. To see exmaple code for Python2.x, plaese see [here](https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers/blob/master/examples/examples.py))
 
-    # input is `unicode` type(in python2x)
-    sentence = u'テヘラン（ペルシア語: تهران  ; Tehrān Tehran.ogg 発音[ヘルプ/ファイル]/teɦˈrɔːn/、英語:Tehran）は、西アジア、イランの首都でありかつテヘラン州の州都。人口12,223,598人。都市圏人口は13,413,348人に達する。'
+```
+import JapaneseTokenizer
+input_sentence = '10日放送の「中居正広のミになる図書館」（テレビ朝日系）で、SMAPの中居正広が、篠原信一の過去の勘違いを明かす一幕があった。'
+# ipadic is well-maintained dictionary #
+mecab_wrapper = JapaneseTokenizer.MecabWrapper(dictType='ipadic')
+print(mecab_wrapper.tokenize(input_sentence).convert_list_object())
 
-    # make MecabWrapper object
-    # path where `mecab-config` command exists. You can check it with `which mecab-config`
-    # default value is '/usr/local/bin'
-    path_mecab_config='/usr/local/bin'
-
-    # you can choose from "neologd", "all", "ipaddic", "user", ""
-    # "ipadic" and "" is equivalent
-    dictType = ""
-
-    mecab_wrapper = MecabWrapper(dictType=dictType, path_mecab_config=path_mecab_config)
-
-    # tokenize sentence. Returned object is list of tuples
-    tokenized_obj = mecab_wrapper.tokenize(sentence=sentence)
-    assert isinstance(tokenized_obj, list)
-
-    # Returned object is "TokenizedSenetence" class if you put return_list=False
-    tokenized_obj = mecab_wrapper.tokenize(sentence=sentence, return_list=False)
+# neologd is automatically-generated dictionary from huge web-corpus #
+mecab_neologd_wrapper = JapaneseTokenizer.MecabWrapper(dictType='neologd')
+print(mecab_neologd_wrapper.tokenize(input_sentence).convert_list_object())
+```
 
 
-Filtering example
+## Filtering example
 
-    stopwords = [u'テヘラン']
-    assert isinstance(tokenized_obj, TokenizedSenetence)
-    # returned object is "FilteredObject" class
-    filtered_obj = mecab_wrapper.filter(
-        parsed_sentence=tokenized_obj,
-        stopwords=stopwords
-    )
-    assert isinstance(filtered_obj, FilteredObject)
+```
+import JapaneseTokenizer
+# with word filtering by stopword & part-of-speech condition #
+print(mecab_wrapper.tokenize(input_sentence).filter(stopwords=['テレビ朝日'], pos_condition=[('名詞', '固有名詞')]).convert_list_object())
+```
 
-    # pos condition is list of tuples
-    # You can set POS condition "ChaSen 品詞体系 (IPA品詞体系)" of this page http://www.unixuser.org/~euske/doc/postag/#chasen
-    pos_condition = [(u'名詞', u'固有名詞'), (u'動詞', u'自立')]
-    filtered_obj = mecab_wrapper.filter(
-        parsed_sentence=tokenized_obj,
-        pos_condition=pos_condition
-    )
+
 
 ## Part-of-speech structure
 
@@ -253,6 +241,10 @@ natto-py is sophisticated package for tokenization. It supports following featur
 * It introduced de-normalization function after tokenization process. (全角英数 -> 半角英数)
 * For mecab-config, it detects path to mecab-config automatically
 * It fixed a bug of initializing juman-object in python2
+
+## after 1.3.0
+
+change logs are in github release.
 
 # LICENSE
 

@@ -4,6 +4,7 @@ from MeCab import Node
 from typing import List, Union, Any, Tuple, Dict, Callable
 from future.utils import string_types, text_type
 import sys
+import six
 __author__ = 'kensuke-mi'
 
 python_version = sys.version_info
@@ -22,20 +23,26 @@ def __is_valid_pos(pos_tuple, valid_pos):
     """This function checks token's pos is with in POS set that user specified.
     If token meets all conditions, Return True; else return False
     """
-    bool_list =[
-        True
-        for pos
-        in valid_pos
-        if set(pos).issubset(set(pos_tuple))
-    ]
-    if list(set(bool_list)) == [True]:
+    # type: (Tuple[string_types,...],List[Tuple[string_types,...]])->bool
+    def is_valid_pos(valid_pos_tuple):
+        """"""
+        # type: (Tuple[string_types,...])->bool
+        length_valid_pos_tuple = len(valid_pos_tuple)
+        if valid_pos_tuple == pos_tuple[:length_valid_pos_tuple]:
+            return True
+        else:
+            return False
+
+    seq_bool_flags = [is_valid_pos(valid_pos_tuple) for valid_pos_tuple in valid_pos]
+
+    if True in set(seq_bool_flags):
         return True
     else:
         return False
 
 
 def filter_words(tokenized_obj, valid_pos, stopwords):
-    # type: (TokenizedSenetence, List[Tuple[str,...]], List[str]) -> FilteredObject
+    # type: (TokenizedSenetence, List[Tuple[string_types,...]], List[string_types]) -> FilteredObject
     """This function filter token that user don't want to take.
     Condition is stopword and pos.
 
@@ -61,7 +68,7 @@ def filter_words(tokenized_obj, valid_pos, stopwords):
         # case1: only pos filtering is ON
         if valid_pos != [] and stopwords == []:
             if res_pos_condition: filtered_tokens.append(token_obj)
-        # case2: obly stopwords filtering is ON
+        # case2: only stopwords filtering is ON
         if valid_pos == [] and stopwords != []:
             if res_stopwords is False: filtered_tokens.append(token_obj)
         # case3: both condition is ON
@@ -81,7 +88,7 @@ def filter_words(tokenized_obj, valid_pos, stopwords):
 class TokenizedResult(object):
     def __init__(self, node_obj, tuple_pos, word_stem, word_surface,
                  is_feature=True, is_surface=False, misc_info=None, analyzed_line=None):
-        # type: (Union[Node, None], Union[str, Tuple[Union[unicode,str], ...], str, str, bool, bool, Union[None, Dict[str, Any]], str])->None
+        # type: (Union[Node, None], Union[str, Tuple[string_types, ...], str, str, bool, bool, Union[None, Dict[str, Any]], str])->None
         assert isinstance(node_obj, (Node, type(None)))
         assert isinstance(tuple_pos, (str, string_types, tuple))
         assert isinstance(word_stem, (str, string_types))
@@ -105,14 +112,20 @@ class TokenizedResult(object):
 
 
 class TokenizedSenetence(object):
-    def __init__(self, sentence, tokenized_objects):
-        """* Args"""
-        # type: (Union[unicode,str], List[TokenizedResult])->None
+    def __init__(self, sentence, tokenized_objects, string_encoding='utf-8'):
+        """* Parameters
+        - sentence: sentence
+        - tokenized_objects: list of TokenizedResult object
+        - string_encoding: Encoding type of string type. This option is used only under python2.x
+        """
+        # type: (string_types, List[TokenizedResult])->None
         assert isinstance(sentence, (str, string_types))
         assert isinstance(tokenized_objects, list)
 
         self.sentence = sentence
         self.tokenized_objects = tokenized_objects
+        self.string_encoding = string_encoding
+
 
     def __extend_token_object(self, token_object,
                               is_denormalize=True,
@@ -166,52 +179,71 @@ class TokenizedSenetence(object):
 
         return sentence_in_list_obj
 
-    def __convert_str(self, p_c_tuple):
-        """"""
-        # type: (Tuple[str,...])->List[str]
-        converted = []
-        for item in p_c_tuple:
-            if isinstance(item, str):
-                converted.append(item)
-            else:
-                converted.append(item)
-        return converted
-
-    def __check_pos_condition_str(self, pos_condistion):
+    def __convert_string_type(self, p_c_tuple):
         """* What you can do
-        - Check your pos condition is correct or NOT
-
-        * Input
-        - pos_condistion
-            - List of Tuple which has POS element to keep.
-            - Keep in your mind, each tokenizer has different POS structure.
-            >>> [('名詞', '固有名詞'), ('動詞', )]
+        - it normalizes string types into str
         """
-        # type: (List[Tuple[str, ...]])->List[Tuple[str, ...]]
-        assert isinstance(pos_condistion, list)
-        # [ ('', '', '') ]
+        # type: (Tuple[string_types,...])->Tuple[string_types]
+        if not isinstance(p_c_tuple, tuple):
+            raise Exception('Pos condition expects tuple of string. However = {}'.format(p_c_tuple))
 
-        return [
-            tuple(self.__convert_str(p_c_tuple))
-            for p_c_tuple
-            in pos_condistion]
+        converted = [object] * len(p_c_tuple)
+        for i, pos_element in enumerate(p_c_tuple):
+            if six.PY2 and isinstance(pos_element, str):
+                """str into unicode if python2.x"""
+                converted[i] = pos_element.decode(self.string_encoding)
+            elif six.PY2 and isinstance(pos_element, unicode):
+                converted[i] = pos_element
+            elif six.PY3:
+                converted[i] = pos_element
+            else:
+                raise Exception()
+
+        return tuple(converted)
+
+    def __check_pos_condition(self, pos_condistion):
+        """* What you can do
+        - Check your pos condition
+        - It converts character type into unicode if python version is 2.x
+        """
+        # type: (List[Tuple[string_types, ...]])->List[Tuple[string_types, ...]]
+        assert isinstance(pos_condistion, list)
+
+        return [self.__convert_string_type(p_c_tuple) for p_c_tuple in pos_condistion]
 
     def filter(self, pos_condition=None, stopwords=None):
         """* What you can do
+        - It filters out token which does NOT meet the conditions (stopwords & part-of-speech tag)
+        - Under python2.x, pos_condition & stopwords are converted into unicode type.
+
+        * Parameters
+        - pos_condition: list of part-of-speech(pos) condition. The pos condition is tuple is variable length.
+        You can specify hierarchical structure of pos condition with variable tuple.
+        The hierarchy of pos condition follows definition of dictionary.
+            - For example, in mecab you can take words with 名詞 if ('名詞',)
+            - For example, in mecab you can take words with 名詞-固有名詞 if ('名詞', '固有名詞')
+        - stopwords: list of word which you would like to remove
+
+        * Example
+        >>> pos_condition = [('名詞', '一般'), ('形容詞', '自立'), ('助詞', '格助詞', '一般')]
+        >>> stopwords = ['これ', 'それ']
         """
-        # type: (List[Tuple[Union[unicode,str],...]], List[Union[unicode,str]])->FilteredObject
+        # type: (List[Tuple[string_types,...]], List[string_types])->FilteredObject
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
-        if isinstance(stopwords, type(None)):
+        if stopwords is None:
             s_words = []
+        elif six.PY2 and all((isinstance(s, str) for s in stopwords)):
+            """under python2.x, from str into unicode"""
+            s_words = [s.decode(self.string_encoding) for s in stopwords]
         else:
             s_words = stopwords
 
-        if isinstance(pos_condition, type(None)):
+        if pos_condition is None:
             p_condition = []
         else:
-            p_condition = self.__check_pos_condition_str(pos_condition)
+            p_condition = self.__check_pos_condition(pos_condition)
 
         filtered_object = filter_words(
             tokenized_obj=self,
