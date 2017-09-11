@@ -18,7 +18,7 @@ python_version = sys.version_info
 
 
 class MecabWrapper(WrapperBase):
-    def __init__(self, dictType, pathUserDictCsv='', path_mecab_config=None):
+    def __init__(self, dictType, pathUserDictCsv='', path_mecab_config=None, string_encoding='utf-8'):
         # type: (str, str, str, str)->None
         assert dictType in ["neologd", "all", "ipadic", "ipaddic", "user", "", None]
         if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
@@ -30,6 +30,7 @@ class MecabWrapper(WrapperBase):
         self._dictType = dictType
         self._pathUserDictCsv = pathUserDictCsv
         self._mecab_dictionary_path = self.__check_mecab_dict_path()
+        self.string_encoding = string_encoding
 
         logger.info("mecab dictionary path is detected under {}".format(self._mecab_dictionary_path))
 
@@ -175,7 +176,10 @@ class MecabWrapper(WrapperBase):
         - Call mecab tokenizer, and return tokenized objects
 
         """
-        # type: (str, bool, bool, bool, bool, Callable[[str], str])->Union[List[str], TokenizedSenetence]
+        # type: (string_types, bool, bool, bool, bool, Callable[[str], str])->Union[List[str], TokenizedSenetence]
+        if isinstance(sentence, str):
+            sentence = sentence.decode(self.string_encoding)
+
         ### decide normalization function depending on dictType
         if func_normalizer is None and self._dictType == 'neologd':
             normalized_sentence = neologdn.normalize(sentence)
