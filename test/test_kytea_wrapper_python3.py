@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from JapaneseTokenizer.kytea_wrapper.kytea_wrapper_python3 import KyteaWrapper
+from JapaneseTokenizer.kytea_wrapper import KyteaWrapper
 from JapaneseTokenizer.datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
 import unittest
 
