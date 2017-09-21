@@ -1,10 +1,13 @@
+[![Build Status](https://travis-ci.org/Kensuke-Mitsuzawa/JapaneseTokenizers.svg?branch=travis)](https://travis-ci.org/Kensuke-Mitsuzawa/JapaneseTokenizers)[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+
+
 # What's this?
 
-This is simple wrapper for Japanese Tokenizers(A.K.A Morphology Splitter)
+This is simple python-wrapper for Japanese Tokenizers(A.K.A Tokenizer)
 
-This project aims to call Tokenizer and split into tokens as easy as possible.
+This project aims to call tokenizers and split a sentence into tokens as easy as possible.
 
-And this project supports various Tokenization tools. You can compare results among them.
+And, this project supports various Tokenization tools common interface. Thus, it's easy to compare output from various tokenizers.
 
 This project is available also in [Github](https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers).  
 
@@ -18,12 +21,11 @@ If you find any bugs, please report them to github issues. Or any pull requests 
 
 # Features
 
-* You can get set of tokens from input sentence
-* You can filter some tokens with your Part-of-Speech condition or stopwords
-* You can add extension dictionary like mecab-neologd dictionary
-* You can define your original dictionary. And this dictionary forces mecab to make it one token
+* simple/common interface among various tokenizers
+* simple/common interface for filtering with stopwords or Part-of-Speech condition 
+* simple interface to add user-dictionary(mecab only)
 
-## Supported Tokenization tool
+## Supported Tokenizers
 
 ### Mecab
 
@@ -172,12 +174,9 @@ print(mecab_wrapper.tokenize(input_sentence).filter(stopwords=['テレビ朝日'
 ```
 
 
-
 ## Part-of-speech structure
 
-Mecab, Juman uses different system of Part-of-Speech(POS).
-
-Keep in your mind when you use it.
+Mecab, Juman, Kytea have different system of Part-of-Speech(POS).
 
 You can check tables of Part-of-Speech(POS) [here](http://www.unixuser.org/~euske/doc/postag/)
 
@@ -193,9 +192,12 @@ natto-py is sophisticated package for tokenization. It supports following featur
 * importing additional dictionary
 * partial parsing mode
 
+# LICENSE
+
+MIT license
+
 
 # CHANGES
-
 
 ## 0.6(2016-03-05)
 
@@ -245,7 +247,3 @@ natto-py is sophisticated package for tokenization. It supports following featur
 ## after 1.3.0
 
 change logs are in github release.
-
-# LICENSE
-
-MIT license
