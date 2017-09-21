@@ -8,6 +8,8 @@ import socket
 from JapaneseTokenizer import init_logger
 import logging
 logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
+# typing
+from typing import Union
 # else
 from six import text_type
 import six
@@ -273,38 +275,33 @@ else:
                         self._sock.sendall(input_string)  # メッセージを返します
                         '''
 
-
-
-
-
-# todo サーバー化したいならば、このクラスを複数たてればいいんじゃない？
-class JumanppHnadler(object):
+class UnixProcessHandler(object):
     def __init__(self,
-                 jumanpp_command,
+                 command,
                  option=None,
                  pattern='EOS',
                  timeout_second=10):
-        """"""
+        """* Get communication with unix process using pexpect module."""
         # type: (text_type,text_type,text_type,int)->None
-        self.jumanpp_command = jumanpp_command
+        self.command = command
         self.timeout_second = timeout_second
         self.pattern = pattern
         self.option = option
-        self.launch_jumanpp_process(jumanpp_command)
+        self.launch_process(command)
 
     def __del__(self):
         if hasattr(self, "process_analyzer"):
             self.process_analyzer.kill(sig=9)
 
-    def launch_jumanpp_process(self, command):
+    def launch_process(self, command):
         """* What you can do
-        - It starts jumanpp process and keep it.
+        - It starts process and keep it.
         """
-        # type: (text_type)->None
+        # type: (Union[bytes,text_type])->None
         if not self.option is None:
-            command_plus_option = self.jumanpp_command + " " + self.option
+            command_plus_option = self.command + " " + self.option
         else:
-            command_plus_option = self.jumanpp_command
+            command_plus_option = self.command
 
         if six.PY3:
             if shutil.which(command) is None:
@@ -321,19 +318,17 @@ class JumanppHnadler(object):
                 self.process_analyzer = pexpect.spawnu(command_plus_option)
                 self.process_id = self.process_analyzer.pid
 
-
     def restart_process(self):
         """"""
         # type: ()->None
         if not self.option is None:
-            command_plus_option = self.jumanpp_command + " " + self.option
+            command_plus_option = self.command + " " + self.option
         else:
-            command_plus_option = self.jumanpp_command
+            command_plus_option = self.command
 
         self.process_analyzer.kill(sig=9)
         self.process_analyzer = pexpect.spawnu(command_plus_option)
         self.process_id = self.process_analyzer.pid
-
 
     def stop_process(self):
         """* What you can do
@@ -346,7 +341,6 @@ class JumanppHnadler(object):
             pass
 
         return True
-
 
     def __query(self, input_string):
         """* What you can do
@@ -380,3 +374,19 @@ class JumanppHnadler(object):
         """
         # type: (text_type)->text_type
         return self.__query(input_string=input_string)
+
+
+class JumanppHnadler(UnixProcessHandler):
+
+    def __init__(self,
+                 jumanpp_command,
+                 option = None,
+                 pattern = 'EOS',
+                 timeout_second = 10):
+        # type: (text_type,text_type,text_type,int)->None
+        super(JumanppHnadler, self).__init__(command=jumanpp_command, option=option, pattern=pattern, timeout_second=timeout_second)
+
+    def launch_jumanpp_process(self, command):
+        """"""
+        # type: (text_type)->None
+        return self.launch_process(command)

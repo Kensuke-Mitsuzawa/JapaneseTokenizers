@@ -12,6 +12,7 @@ from pyknp import MList
 import logging
 import sys
 import os
+import six
 
 logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 __author__ = 'kensuke-mi'
@@ -22,6 +23,44 @@ try:
     import pyknp
 except ImportError:
     logger.warning(msg='pyknp is not ready to use. Install first if you would like to use pyknp wrapper.')
+
+if six.PY3:
+    import socket, re
+
+    class MonkeyPatchSocket(object):
+        """* Class for overwriting pyknp.Socket because it is only for python2.x"""
+        def __init__(self, hostname, port, option=None):
+            try:
+                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.sock.connect((hostname, port))
+            except:
+                raise
+            if option is not None:
+                self.sock.send(option)
+            data = b""
+            while b"OK" not in data:
+                #while isinstance(data, bytes) and b"OK" not in data:
+                data = self.sock.recv(1024)
+
+        def __del__(self):
+            if self.sock:
+                self.sock.close()
+
+        def query(self, sentence, pattern):
+            """"""
+            # type: (str,str)->str
+            assert(isinstance(sentence, six.text_type))
+            sentence_bytes = sentence.encode('utf-8').strip()
+            pattern_bytes = pattern.encode('utf-8')
+
+            self.sock.sendall(sentence_bytes + b"\n")
+            data = self.sock.recv(1024)
+            assert isinstance(data, bytes)
+            recv = data
+            while not re.search(pattern_bytes, recv):
+                data = self.sock.recv(1024)
+                recv = recv + data
+            return recv.strip().decode('utf-8')
 
 
 class JumanWrapper(WrapperBase):
@@ -37,7 +76,7 @@ class JumanWrapper(WrapperBase):
                  **args):
         """* Class to call Juman tokenizer
         """
-        # type: (text_type,Union[str,None],int,int,text_type,Union[bytes,str],Union[bytes,str],bool)->None
+        # type: (text_type,text_type,int,int,text_type,Union[bytes,text_type],Union[bytes,text_type],bool)->None
 
         self.timeout = timeout
         self.pattern = pattern
@@ -47,8 +86,8 @@ class JumanWrapper(WrapperBase):
             raise FileExistsError('rcfile does not exist at {}'.format(rcfile))
         if not server is None:
             ### It converts from str into bytes only for sever mode ###
-            self.option = self.option.encode('utf-8')
-            self.pattern = self.pattern.encode('utf-8')
+            self.option = self.option.encode('utf-8')  # type: Union[str,bytes]
+            self.pattern = self.pattern.encode('utf-8')  # type: Union[str,bytes]
         else:
             pass
 
@@ -63,11 +102,21 @@ class JumanWrapper(WrapperBase):
             pass
 
 
-        if is_use_pyknp:
+        if not server is None:
+            ## use server mode ##
+            self.juman = pyknp.Juman(command=command, server=server, port=port,
+                                     timeout=self.timeout, rcfile=rcfile, option=option,
+                                     pattern=pattern, **args)
+            if six.PY3:
+                ### It overwrites juman_lines() method ###
+                self.juman.juman_lines = self.__monkey_patch_juman_lines
+        elif is_use_pyknp and server is None:
+            ## use unix process with pyknp
             self.juman = pyknp.Juman(command=command, server=server, port=port,
                                      timeout=self.timeout, rcfile=rcfile, option=option,
                                      pattern=pattern, **args)
         else:
+            ## use unix process with pexpect(RECOMMENDED) ##
             self.juman = JumanppHnadler(jumanpp_command=command,
                                         option=self.option,
                                         pattern=self.pattern,
@@ -77,6 +126,24 @@ class JumanWrapper(WrapperBase):
         if hasattr(self, "juman"):
             if isinstance(self.juman, JumanppHnadler):
                 self.juman.stop_process()
+
+    def __monkey_patch_juman_lines(self, input_str):
+        """* What you can do
+        - It overwrites juman_line() method because this method causes TypeError in python3
+        """
+        # type: (text_type)->text_type
+        assert isinstance(self.juman, pyknp.Juman)
+        if not self.juman.socket and not self.juman.subprocess:
+            if self.juman.server is not None:
+                self.juman.socket = MonkeyPatchSocket(self.juman.server, self.juman.port, b"RUN -e2\n")
+            else:
+                command = "%s %s" % (self.juman.command, self.juman.option)
+                if self.juman.rcfile:
+                    command += " -r %s" % self.juman.rcfile
+                self.juman.subprocess = pyknp.Subprocess(command)
+        if self.juman.socket:
+            return self.juman.socket.query(input_str, pattern=self.juman.pattern)
+        return self.juman.subprocess.query(input_str, pattern=self.juman.pattern)
 
     def __extract_morphological_information(self, mrph_object, is_feature, is_surface):
         """This method extracts morphlogical information from token object.
