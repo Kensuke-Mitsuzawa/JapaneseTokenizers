@@ -5,7 +5,7 @@ from __future__ import absolute_import
 from __future__ import division
 from future.utils import string_types, text_type
 from JapaneseTokenizer.datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
-from JapaneseTokenizer.juman_wrapper.juman_wrapper_python2 import JumanWrapper
+from JapaneseTokenizer.juman_wrapper import JumanWrapper
 import pyknp
 import unittest
 import sys

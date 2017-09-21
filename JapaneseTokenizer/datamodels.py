@@ -5,7 +5,7 @@ from JapaneseTokenizer.common.text_preprocess import normalize_text, denormalize
 from MeCab import Node
 # typing #
 from typing import List, Union, Any, Tuple, Dict, Callable
-from future.utils import string_types, text_type
+from future.utils import text_type
 import sys
 import six
 __author__ = 'kensuke-mi'
@@ -26,10 +26,10 @@ def __is_valid_pos(pos_tuple, valid_pos):
     """This function checks token's pos is with in POS set that user specified.
     If token meets all conditions, Return True; else return False
     """
-    # type: (Tuple[string_types,...],List[Tuple[string_types,...]])->bool
+    # type: (Tuple[text_type,...],List[Tuple[text_type,...]])->bool
     def is_valid_pos(valid_pos_tuple):
         """"""
-        # type: (Tuple[string_types,...])->bool
+        # type: (Tuple[text_type,...])->bool
         length_valid_pos_tuple = len(valid_pos_tuple)
         if valid_pos_tuple == pos_tuple[:length_valid_pos_tuple]:
             return True
@@ -45,7 +45,7 @@ def __is_valid_pos(pos_tuple, valid_pos):
 
 
 def filter_words(tokenized_obj, valid_pos, stopwords):
-    # type: (TokenizedSenetence, List[Tuple[string_types,...]], List[string_types]) -> FilteredObject
+    # type: (TokenizedSenetence, List[Tuple[text_type,...]], List[text_type]) -> FilteredObject
     """This function filter token that user don't want to take.
     Condition is stopword and pos.
 
@@ -91,11 +91,11 @@ def filter_words(tokenized_obj, valid_pos, stopwords):
 class TokenizedResult(object):
     def __init__(self, node_obj, tuple_pos, word_stem, word_surface,
                  is_feature=True, is_surface=False, misc_info=None, analyzed_line=None):
-        # type: (Union[Node, None], Union[str, Tuple[string_types, ...], str, str, bool, bool, Union[None, Dict[str, Any]], str])->None
+        # type: (Union[Node, None], Union[str, Tuple[text_type, ...], str, str, bool, bool, Union[None, Dict[str, Any]], str])->None
         assert isinstance(node_obj, (Node, type(None)))
-        assert isinstance(tuple_pos, (str, string_types, tuple))
-        assert isinstance(word_stem, (str, string_types))
-        assert isinstance(word_surface, (str, string_types))
+        assert isinstance(tuple_pos, (text_type, tuple))
+        assert isinstance(word_stem, (text_type))
+        assert isinstance(word_surface, text_type)
         assert isinstance(misc_info, (type(None), dict))
 
         self.node_obj = node_obj
@@ -108,7 +108,7 @@ class TokenizedResult(object):
 
         if isinstance(tuple_pos, tuple):
             self.tuple_pos = tuple_pos
-        elif isinstance(tuple_pos, (str, string_types)):
+        elif isinstance(tuple_pos, text_type):
             self.tuple_pos = ('*', )
         else:
             raise Exception('Error while parsing feature object. {}'.format(self.tuple_pos))
@@ -121,8 +121,8 @@ class TokenizedSenetence(object):
         - tokenized_objects: list of TokenizedResult object
         - string_encoding: Encoding type of string type. This option is used only under python2.x
         """
-        # type: (string_types, List[TokenizedResult])->None
-        assert isinstance(sentence, (str, string_types))
+        # type: (text_type, List[TokenizedResult])->None
+        assert isinstance(sentence, text_type)
         assert isinstance(tokenized_objects, list)
 
         self.sentence = sentence
@@ -186,7 +186,7 @@ class TokenizedSenetence(object):
         """* What you can do
         - it normalizes string types into str
         """
-        # type: (Tuple[string_types,...])->Tuple[string_types]
+        # type: (Tuple[text_type,...])->Tuple[text_type]
         if not isinstance(p_c_tuple, tuple):
             raise Exception('Pos condition expects tuple of string. However = {}'.format(p_c_tuple))
 
@@ -195,7 +195,7 @@ class TokenizedSenetence(object):
             if six.PY2 and isinstance(pos_element, str):
                 """str into unicode if python2.x"""
                 converted[i] = pos_element.decode(self.string_encoding)
-            elif six.PY2 and isinstance(pos_element, unicode):
+            elif six.PY2 and isinstance(pos_element, text_type):
                 converted[i] = pos_element
             elif six.PY3:
                 converted[i] = pos_element
@@ -209,7 +209,7 @@ class TokenizedSenetence(object):
         - Check your pos condition
         - It converts character type into unicode if python version is 2.x
         """
-        # type: (List[Tuple[string_types, ...]])->List[Tuple[string_types, ...]]
+        # type: (List[Tuple[text_type, ...]])->List[Tuple[text_type, ...]]
         assert isinstance(pos_condistion, list)
 
         return [self.__convert_string_type(p_c_tuple) for p_c_tuple in pos_condistion]
@@ -237,7 +237,7 @@ class TokenizedSenetence(object):
         >>> pos_condition = [('名詞', '一般'), ('形容詞', '自立'), ('助詞', '格助詞', '一般')]
         >>> stopwords = ['これ', 'それ']
         """
-        # type: (List[Tuple[string_types,...]], List[string_types], bool, Callable[[string_types], string_types])->FilteredObject
+        # type: (List[Tuple[text_type,...]], List[text_type], bool, Callable[[text_type], text_type])->FilteredObject
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 

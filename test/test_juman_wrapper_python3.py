@@ -3,7 +3,7 @@
 # do your test with command line
 from pyknp import Juman
 from JapaneseTokenizer.datamodels import TokenizedResult, TokenizedSenetence, FilteredObject
-from JapaneseTokenizer.juman_wrapper.juman_wrapper_python3 import JumanWrapper
+from JapaneseTokenizer.juman_wrapper import JumanWrapper
 import pyknp
 import unittest
 import os

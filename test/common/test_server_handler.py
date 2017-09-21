@@ -4,9 +4,9 @@ from JapaneseTokenizer.common import sever_handler
 # client module
 import six
 if six.PY2:
-    from JapaneseTokenizer.jumanpp_wrapper.jumanpp_wrapper_python2 import JumanppWrapper
+    from JapaneseTokenizer.jumanpp_wrapper.__jumanpp_wrapper_python2 import JumanppWrapper
 else:
-    from JapaneseTokenizer.jumanpp_wrapper.jumanpp_wrapper_python3 import JumanppWrapper
+    from JapaneseTokenizer.jumanpp_wrapper.__jumanpp_wrapper_python3 import JumanppWrapper
 # else
 import sys
 import unittest

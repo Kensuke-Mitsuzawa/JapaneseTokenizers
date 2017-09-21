@@ -1,3 +1,4 @@
+'''
 #! -*- coding: utf-8 -*-
 # package modules
 from JapaneseTokenizer.object_models import WrapperBase
@@ -205,4 +206,4 @@ class JumanWrapper(WrapperBase):
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
-        return parsed_sentence.filter(pos_condition, stopwords)
+        return parsed_sentence.filter(pos_condition, stopwords)'''
