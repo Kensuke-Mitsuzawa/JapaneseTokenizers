@@ -3,7 +3,7 @@ __author__ = 'kensuke-mi'
 
 import sys
 import unittest
-from JapaneseTokenizer.mecab_wrapper.mecab_wrapper_python2 import MecabWrapper
+from JapaneseTokenizer.mecab_wrapper.mecab_wrapper import MecabWrapper
 from JapaneseTokenizer.datamodels import TokenizedSenetence
 from six import string_types
 import os

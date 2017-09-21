@@ -17,7 +17,7 @@ def suite():
         suite.addTest(unittest.makeSuite(TestKyteaWrapperPython3))
         suite.addTest(unittest.makeSuite(TestMecabWrapperPython3))
         suite.addTest(unittest.makeSuite(TestJumanWrapperPython3))
-        suite.addTest(unittest.makeSuite(TestJumanppWrapperPython3))
+        #suite.addTest(unittest.makeSuite(TestJumanppWrapperPython3))
     else:
         from .test_filter_python2 import TestFilter
         from .test_mecab_wrapper_python2 import TestMecabWrapperPython2
@@ -28,7 +28,6 @@ def suite():
         suite.addTest(unittest.makeSuite(TestKyteaWrapperPython2))
         suite.addTest(unittest.makeSuite(TestMecabWrapperPython2))
         suite.addTest(unittest.makeSuite(TestJumanWrapperPython2))
-        suite.addTest(unittest.makeSuite(TestJumanppWrapperPython2))
-
+        #suite.addTest(unittest.makeSuite(TestJumanppWrapperPython2))
 
     return suite

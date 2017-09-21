@@ -5,7 +5,7 @@ from JapaneseTokenizer.common.text_preprocess import normalize_text, denormalize
 from MeCab import Node
 # typing #
 from typing import List, Union, Any, Tuple, Dict, Callable
-from future.utils import text_type
+from future.utils import text_type, string_types
 import sys
 import six
 __author__ = 'kensuke-mi'
@@ -93,8 +93,8 @@ class TokenizedResult(object):
                  is_feature=True, is_surface=False, misc_info=None, analyzed_line=None):
         # type: (Union[Node, None], Union[str, Tuple[text_type, ...], str, str, bool, bool, Union[None, Dict[str, Any]], str])->None
         assert isinstance(node_obj, (Node, type(None)))
-        assert isinstance(tuple_pos, (text_type, tuple))
-        assert isinstance(word_stem, (text_type))
+        assert isinstance(tuple_pos, (string_types, tuple))
+        assert isinstance(word_stem, (string_types))
         assert isinstance(word_surface, text_type)
         assert isinstance(misc_info, (type(None), dict))
 
@@ -108,10 +108,10 @@ class TokenizedResult(object):
 
         if isinstance(tuple_pos, tuple):
             self.tuple_pos = tuple_pos
-        elif isinstance(tuple_pos, text_type):
+        elif isinstance(tuple_pos, string_types):
             self.tuple_pos = ('*', )
         else:
-            raise Exception('Error while parsing feature object. {}'.format(self.tuple_pos))
+            raise Exception('Error while parsing feature object. {}'.format(tuple_pos))
 
 
 class TokenizedSenetence(object):
