@@ -4,7 +4,7 @@ from JapaneseTokenizer.common import text_preprocess
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, TokenizedSenetence
 from JapaneseTokenizer import init_logger
 from typing import List, Tuple, Any, Union, Callable
-from six import text_type
+from six import text_type, string_types
 import logging
 import sys
 import six
@@ -22,9 +22,11 @@ __author__ = 'kensuke-mi'
 
 
 class KyteaWrapper(WrapperBase):
-    def __init__(self, option_string=''):
-        assert isinstance(option_string, text_type)
+    def __init__(self,
+                 option_string='-deftag UNKNOWN!!'):
+        # type: (string_types)->None
         # option string is argument of Kytea.
+        assert isinstance(option_string, string_types)
         self.kytea = Mykytea.Mykytea(option_string)
 
     def __list_tags(self, t):
@@ -106,7 +108,7 @@ class KyteaWrapper(WrapperBase):
         normalized_sentence = func_normalizer(sentence)
         if six.PY2:
             normalized_sentence = normalized_sentence.encode('utf-8')
-        
+
         result = self.__list_tags(self.kytea.getTags(normalized_sentence))
 
         token_objects = [
