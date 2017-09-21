@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
-from six import string_types
+from six import text_type
 import jaconv
 import six
 import re
@@ -22,6 +22,7 @@ else: # python3
 
 STRING_EXCEPTION = set([u('*')])
 
+
 def denormalize_text(input_text):
     """* What you can do
     - It converts text into standard japanese writing way
@@ -30,7 +31,7 @@ def denormalize_text(input_text):
     - hankaku-katakana is to zenkaku-katakana
     - zenkaku-eisu is to hankaku-eisu
     """
-    # type: (str)->str
+    # type: (text_type)->text_type
     if input_text in STRING_EXCEPTION:
         return input_text
     else:
@@ -50,7 +51,7 @@ def normalize_text(input_text,
     * Params
     - new_line_replaced: a string which replaces from \n string.
     """
-    # type: (string_types,string_types,string_types,bool,bool,bool,bool)->string_types
+    # type: (text_type,text_type,text_type,bool,bool,bool,bool)->text_type
     if is_replace_eos:
         without_new_line = input_text.replace('\n', new_line_replaced)
     else:
@@ -67,5 +68,5 @@ def normalize_text_normal_ipadic(input_text, kana=True, ascii=True, digit=True):
     * All hankaku Katanaka is converted into Zenkaku Katakana
     * All hankaku English alphabet and numberc string are converted into Zenkaku one
     """
-    # type: (str,bool,bool,bool)->str
+    # type: (text_type,bool,bool,bool)->text_type
     return jaconv.h2z(input_text, kana=kana, ascii=ascii, digit=digit)
