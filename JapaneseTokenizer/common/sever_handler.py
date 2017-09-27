@@ -19,6 +19,10 @@ import signal
 import os
 
 
+class ProcessDownException(Exception):
+    pass
+
+
 class UnixProcessHandler(object):
     def __init__(self,
                  command,
@@ -109,7 +113,7 @@ class UnixProcessHandler(object):
                 buffer += line_string
 
     def __notify_handler(self, signum, frame):
-        raise Exception("""It takes longer time than {time} seconds. You're able to try, 
+        raise ProcessDownException("""It takes longer time than {time} seconds. You're able to try, 
         1. Change your setting of 'timeout_second' parameter
         2. Run restart_process() method when the exception happens.""".format(**{"time": self.timeout_second}))
 
