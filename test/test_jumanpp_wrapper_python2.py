@@ -93,6 +93,22 @@ class TestJumanppWrapperPython2(unittest.TestCase):
         tokenized_obj = jumanpp_tokenizer.tokenize(sentence=test_sentence, return_list=False)
         assert isinstance(tokenized_obj, TokenizedSenetence)
 
+    def test_jumanpp_huge_amount_text(self):
+        """pexpectを利用した大量テキスト処理 & テキスト処理中のプロセス再起動"""
+        logger.info('under testing of processing huge amount of text...')
+        seq_test_sentence = [u'外国人参政権を欲しい。'] * 500
+        jumanpp_tokenizer = JumanppWrapper(is_use_pyknp=False, command=self.path_to_juman_command)
+        self.assertTrue(isinstance(jumanpp_tokenizer.jumanpp_obj, JumanppHnadler))
+        for i, test_s in enumerate(seq_test_sentence):
+            tokenized_obj = jumanpp_tokenizer.tokenize(sentence=test_s)
+            self.assertTrue(isinstance(tokenized_obj, TokenizedSenetence))
+            if not i == 0 and i % 100 == 0:
+                """強制的にプロセスを殺して再起動"""
+                logger.info('It forces stop unix process.')
+                jumanpp_tokenizer.jumanpp_obj.restart_process()
+        else:
+            pass
+
 
 if __name__ == '__main__':
     unittest.main()
