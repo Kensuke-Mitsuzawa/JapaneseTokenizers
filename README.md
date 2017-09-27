@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Kensuke-Mitsuzawa/JapaneseTokenizers.svg?branch=travis)](https://travis-ci.org/Kensuke-Mitsuzawa/JapaneseTokenizers)[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)[![Build Status](https://travis-ci.org/Kensuke-Mitsuzawa/JapaneseTokenizers.svg?branch=master)](https://travis-ci.org/Kensuke-Mitsuzawa/JapaneseTokenizers)
 
 
 # What's this?
