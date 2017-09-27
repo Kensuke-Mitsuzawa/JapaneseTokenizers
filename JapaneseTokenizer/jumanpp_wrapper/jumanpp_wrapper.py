@@ -4,7 +4,7 @@ from pyknp import MList
 # modules
 from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common import text_preprocess, juman_utils
-from JapaneseTokenizer.common.sever_handler import JumanppHnadler
+from JapaneseTokenizer.common.sever_handler import JumanppHnadler, ProcessDownException
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.datamodels import FilteredObject, TokenizedSenetence
 from typing import List, Dict, Tuple, Union, TypeVar, Any, Callable
@@ -128,6 +128,13 @@ class JumanppWrapper(WrapperBase):
         # type: (text_type,int,text_type,text_type,bool)->None
         self.eos_pattern = pattern
         self.is_use_pyknp = is_use_pyknp
+
+
+        if six.PY2:
+            self.dummy_text = 'これはダミーテキストです'.decode('utf-8')
+        elif six.PY3:
+            self.dummy_text = 'これはダミーテキストです'
+
         if not server is None:
             pattern = pattern.encode('utf-8')
         else:
@@ -145,6 +152,7 @@ class JumanppWrapper(WrapperBase):
 
         if server is None and self.is_use_pyknp:
             # jumanpp-pexpect #
+            logger.debug('jumanpp wrapper is initialized with pyknp package')
             self.jumanpp_obj = Jumanpp(
                 command=command,
                 timeout=timeout,
@@ -152,7 +160,10 @@ class JumanppWrapper(WrapperBase):
                 **args)
         elif server is None:
             # jumanpp-pexpect #
-            self.jumanpp_obj = JumanppHnadler(jumanpp_command=command, timeout_second=timeout, pattern=pattern)
+            logger.debug('jumanpp wrapper is initialized with pexpect unix handler')
+            self.jumanpp_obj = JumanppHnadler(jumanpp_command=command, timeout_second=timeout, pattern=pattern)  # type: JumanppHnadler
+            # put dummy sentence to avoid exception just after command initialization #
+            res = self.jumanpp_obj.query(self.dummy_text)
         else:
             # jumanpp-server #
             self.jumanpp_obj = JumanppClient(hostname=server, port=port, timeout=timeout)
@@ -181,11 +192,21 @@ class JumanppWrapper(WrapperBase):
         elif isinstance(self.jumanpp_obj, JumanppHnadler):
             try:
                 result_token = self.jumanpp_obj.query(input_string=input_str)
+            except ProcessDownException:
+                """Unix process is down by any reason."""
+                logger.warning("Re-starting unix process because it takes longer time than {} seconds...".format(self.jumanpp_obj.timeout_second))
+                self.jumanpp_obj.restart_process()
+                self.jumanpp_obj.query(self.dummy_text)
+                result_token = self.jumanpp_obj.query(input_string=input_str)
+                ml_token_object = MList(result_token)
             except UnicodeDecodeError:
                 logger.warning(msg="Process is down by some reason. It restarts process automatically.")
                 self.jumanpp_obj.restart_process()
+                self.jumanpp_obj.query(self.dummy_text)
                 result_token = self.jumanpp_obj.query(input_string=input_str)
-            ml_token_object = MList(result_token)
+                ml_token_object = MList(result_token)
+            else:
+                ml_token_object = MList(result_token)
         elif isinstance(self.jumanpp_obj, JumanppClient):
             server_response = self.jumanpp_obj.query(sentence=input_str, pattern=self.eos_pattern)
             ml_token_object = MList(server_response)
