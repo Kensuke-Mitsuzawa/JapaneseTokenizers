@@ -50,6 +50,7 @@ class KyteaWrapper(WrapperBase):
         assert isinstance(is_feature, bool)
 
         surface = self.__check_char_set(kytea_tags_tuple[0])
+        # NOTE: kytea does NOT show word stem. Put blank string instead.
         if six.PY2:
             word_stem = ''.decode('utf-8')
         else:
@@ -136,4 +137,4 @@ class KyteaWrapper(WrapperBase):
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
-        return parsed_sentence.filter(pos_condition, stopwords)
+        return parsed_sentence.filter(pos_condition, stopwords, check_field_name='surface')

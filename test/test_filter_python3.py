@@ -11,7 +11,7 @@ class TestFilter(unittest.TestCase):
     def setUp(self):
         '''紗倉 まな（さくらまな、１９９３年３月２３日 - ）は、日本のAV女優みたいだ。'''
         self.test_senetence = '紗倉 まなは、日本のAV女優みたいで、うつくしい。そこで、ぼくはその１枚のはなやかな作品を見たいと思った。'
-        self.stopword = ['AV']
+        self.stopword = ['AV', '女優']
         self.pos_condition = [('名詞', '一般',), ('名詞', '固有名詞'), ('形容詞', '自立',), ('助詞', '格助詞', '引用')]
         self.path_user_dict = os.path.join(os.path.dirname(__file__), 'resources/test/userdict.csv')
 
@@ -34,6 +34,10 @@ class TestFilter(unittest.TestCase):
             # 結果に入っているべき品詞 #
             bool_any = any(set(match_pos).issubset(set(pos_tuple)) for match_pos in seq_match_pos)
             self.assertTrue(bool_any)
+
+            # stopwordsのチェック
+            self.assertTrue(token_obj.word_stem not in self.stopword)
+
 
 
 if __name__ == '__main__':

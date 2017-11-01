@@ -44,8 +44,8 @@ def __is_valid_pos(pos_tuple, valid_pos):
         return False
 
 
-def filter_words(tokenized_obj, valid_pos, stopwords):
-    # type: (TokenizedSenetence, List[Tuple[text_type,...]], List[text_type]) -> FilteredObject
+def filter_words(tokenized_obj, valid_pos, stopwords, check_field_name='stem'):
+    # type: (TokenizedSenetence, List[Tuple[text_type,...]], List[text_type],text_type) -> FilteredObject
     """This function filter token that user don't want to take.
     Condition is stopword and pos.
 
@@ -65,7 +65,11 @@ def filter_words(tokenized_obj, valid_pos, stopwords):
     filtered_tokens = []
     for token_obj in tokenized_obj.tokenized_objects:
         assert isinstance(token_obj, TokenizedResult)
-        res_stopwords = __is_sotpwords(token_obj.word_surface, stopwords)
+        if check_field_name=='stem':
+            res_stopwords = __is_sotpwords(token_obj.word_stem, stopwords)
+        else:
+            res_stopwords = __is_sotpwords(token_obj.word_surface, stopwords)
+
         res_pos_condition = __is_valid_pos(token_obj.tuple_pos, valid_pos)
 
         # case1: only pos filtering is ON
@@ -218,7 +222,8 @@ class TokenizedSenetence(object):
                pos_condition=None,
                stopwords=None,
                is_normalize=True,
-               func_normalizer=normalize_text):
+               func_normalizer=normalize_text,
+               check_field_name='stem'):
         """* What you can do
         - It filters out token which does NOT meet the conditions (stopwords & part-of-speech tag)
         - Under python2.x, pos_condition & stopwords are converted into unicode type.
@@ -232,12 +237,13 @@ class TokenizedSenetence(object):
         - stopwords: list of word which you would like to remove
         - is_normalize: Boolean flag for normalize stopwords.
         - func_normalizer: Function object for normalization. The function object must be the same one as when you use tokenize.
+        - check_field_name: Put field name to check if stopword or NOT. Kytea does not have stem form of word, put 'surface' instead.
 
         * Example
         >>> pos_condition = [('名詞', '一般'), ('形容詞', '自立'), ('助詞', '格助詞', '一般')]
         >>> stopwords = ['これ', 'それ']
         """
-        # type: (List[Tuple[text_type,...]], List[text_type], bool, Callable[[text_type], text_type])->FilteredObject
+        # type: (List[Tuple[text_type,...]], List[text_type], bool, Callable[[text_type], text_type],text_type)->FilteredObject
         assert isinstance(pos_condition, (type(None), list))
         assert isinstance(stopwords, (type(None), list))
 
@@ -264,7 +270,8 @@ class TokenizedSenetence(object):
         filtered_object = filter_words(
             tokenized_obj=self,
             valid_pos=p_condition,
-            stopwords=s_words
+            stopwords=s_words,
+            check_field_name=check_field_name
         )
         assert isinstance(filtered_object, FilteredObject)
 
