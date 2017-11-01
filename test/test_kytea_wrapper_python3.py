@@ -77,7 +77,7 @@ class TestKyteaWrapperPython3(unittest.TestCase):
 
 
     def test_stopwords(self):
-        stopword = ['ＡＶ', '女優']
+        stopword = ['女優']
         print ('Stopwords Filtering Test. Stopwords is {}'.format(','.join(stopword)))
         test_sentence = "紗倉 まな（さくら まな、1993年3月23日 - ）は、日本のAV女優。"
         kytea_wrapper = KyteaWrapper()
