@@ -65,7 +65,7 @@ def filter_words(tokenized_obj, valid_pos, stopwords):
     filtered_tokens = []
     for token_obj in tokenized_obj.tokenized_objects:
         assert isinstance(token_obj, TokenizedResult)
-        res_stopwords = __is_sotpwords(token_obj.word_surface, stopwords)
+        res_stopwords = __is_sotpwords(token_obj.word_stem, stopwords)
         res_pos_condition = __is_valid_pos(token_obj.tuple_pos, valid_pos)
 
         # case1: only pos filtering is ON
