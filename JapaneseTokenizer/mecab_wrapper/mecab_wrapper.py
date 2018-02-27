@@ -10,7 +10,6 @@ import sys
 import os
 import logging
 import subprocess
-import neologdn
 import six
 from six import text_type
 # typing
@@ -21,6 +20,13 @@ __author__ = 'kensuke-mi'
 
 logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 python_version = sys.version_info
+
+try:
+    import neologdn
+    is_neologdn_valid = True
+except:
+    logger.warning("neologdn package is not installed yet. You could not call neologd dictionary.")
+    is_neologdn_valid = False
 
 
 class MecabWrapper(WrapperBase):
@@ -243,8 +249,10 @@ class MecabWrapper(WrapperBase):
             pass
 
         ### decide normalization function depending on dictType
-        if func_normalizer is None and self._dictType == 'neologd':
+        if func_normalizer is None and self._dictType == 'neologd' and is_neologdn_valid:
             normalized_sentence = neologdn.normalize(sentence)
+        elif func_normalizer is None and self._dictType == 'neologd' and is_neologdn_valid == False:
+            raise Exception("You could not call neologd dictionary bacause you do NOT install the package neologdn.")
         elif func_normalizer == normalize_text:
             normalized_sentence = normalize_text(sentence, dictionary_mode=self._dictType)
         elif func_normalizer is None:
