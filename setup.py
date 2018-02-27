@@ -38,17 +38,26 @@ except ImportError:
     except ImportError:
         logger.error('We failed to install pyknp automatically. Try installing pyknp manually.')
 # --------------------------------------------------------------------------------------------------------
+try:
+    import neologdn
+except ImportError:
+    try:
+        pip.main(['install', 'neologdn'])
+        import neologdn
+    except:
+        logger.error('We failed to install neologdn automatically because of some issues in the package. Try installing pyknp manually.')
+# --------------------------------------------------------------------------------------------------------
 
 if python_version >= (3, 0, 0):
     logger.info(msg='python={}'.format(python_version))
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'neologdn', 'pexpect']
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'pexpect']
 elif python_version <= (2, 9, 9):
     logger.info(msg='python={}'.format(python_version))
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'neologdn', 'pexpect']
+    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'pexpect']
 else:
     raise NotImplementedError()
 
-version = '1.3.6'
+version = '1.3.7'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 

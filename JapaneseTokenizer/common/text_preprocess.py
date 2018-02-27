@@ -8,7 +8,9 @@ import jaconv
 import six
 import re
 import unicodedata
-import neologdn
+from JapaneseTokenizer import init_logger
+import logging
+logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 __author__ = 'kensuke-mi'
 
 if six.PY2:
@@ -19,6 +21,13 @@ else: # python3
     def u(str): return str
     def b(str): return str.encode("utf-8")
     pass
+
+try:
+    import neologdn
+    is_neologdn_valid = True
+except:
+    logger.warning("neologdn package is not installed yet. You could not call neologd dictionary.")
+    is_neologdn_valid = False
 
 STRING_EXCEPTION = set([u('*')])
 
@@ -57,8 +66,10 @@ def normalize_text(input_text,
     else:
         without_new_line = new_line_replaced
 
-    if dictionary_mode=='neologd':
+    if dictionary_mode=='neologd' and is_neologdn_valid:
         return neologdn.normalize(normalize_text_normal_ipadic(without_new_line))
+    elif dictionary_mode=='neologd' and is_neologdn_valid == False:
+        raise Exception("You could not call neologd dictionary bacause you do NOT install the package neologdn.")
     else:
         return normalize_text_normal_ipadic(without_new_line, kana=is_kana, ascii=is_ascii, digit=is_digit)
 
