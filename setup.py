@@ -37,6 +37,23 @@ except ImportError:
         import pyknp
     except ImportError:
         logger.error('We failed to install pyknp automatically. Try installing pyknp manually.')
+
+# --------------------------------------------------------------------------------------------------------
+# try to install sudachi-py automatically because it usually causes to error during installing
+try:
+    # noinspection PyUnboundLocalVariable
+    import pyknp
+except ImportError:
+    try:
+        pip.main(['install',
+                  'git+https://github.com/WorksApplications/SudachiPy.git'])
+    except:
+        logger.error('We failed to install sudachi-py automatically. Try installing sudachi-py manually.')
+
+    try:
+        import sudachipy
+    except ImportError:
+        logger.error('We failed to install sudachi-py automatically. Try installing sudachi-py manually.')
 # --------------------------------------------------------------------------------------------------------
 try:
     import neologdn
