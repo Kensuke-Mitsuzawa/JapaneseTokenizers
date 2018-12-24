@@ -18,6 +18,7 @@ addons:
     - gcc-5
     - g++-5
     - build-essential
+    - swig
     sources:
     - ubuntu-toolchain-r-test
 before_install:

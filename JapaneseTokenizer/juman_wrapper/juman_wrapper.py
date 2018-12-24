@@ -85,7 +85,7 @@ class JumanWrapper(WrapperBase):
         if not rcfile is None and not os.path.exists(rcfile):
             raise FileExistsError('rcfile does not exist at {}'.format(rcfile))
         if not server is None:
-            ### It converts from str into bytes only for sever mode ###
+            # It converts from str into bytes only for sever mode #
             self.option = self.option.encode('utf-8')  # type: Union[str,bytes]
             self.pattern = self.pattern.encode('utf-8')  # type: Union[str,bytes]
         else:
@@ -103,20 +103,20 @@ class JumanWrapper(WrapperBase):
 
 
         if not server is None:
-            ## use server mode ##
+            # use server mode #
             self.juman = pyknp.Juman(command=command, server=server, port=port,
                                      timeout=self.timeout, rcfile=rcfile, option=option,
-                                     pattern=pattern, **args)
+                                     pattern=pattern, jumanpp=False, **args)
             if six.PY3:
-                ### It overwrites juman_lines() method ###
+                # It overwrites juman_lines() method #
                 self.juman.juman_lines = self.__monkey_patch_juman_lines
         elif is_use_pyknp and server is None:
-            ## use unix process with pyknp
+            # use unix process with pyknp
             self.juman = pyknp.Juman(command=command, server=server, port=port,
                                      timeout=self.timeout, rcfile=rcfile, option=option,
-                                     pattern=pattern, **args)
+                                     pattern=pattern, jumanpp=False, **args)
         else:
-            ## use unix process with pexpect(RECOMMENDED) ##
+            # use unix process with pexpect(RECOMMENDED) #
             self.juman = JumanppHnadler(jumanpp_command=command,
                                         option=self.option,
                                         pattern=self.pattern,
@@ -131,7 +131,7 @@ class JumanWrapper(WrapperBase):
         """* What you can do
         - It overwrites juman_line() method because this method causes TypeError in python3
         """
-        # type: (text_type)->text_type
+        # type: (text_type,)->text_type
         assert isinstance(self.juman, pyknp.Juman)
         if not self.juman.socket and not self.juman.subprocess:
             if self.juman.server is not None:

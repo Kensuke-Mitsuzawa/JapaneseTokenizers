@@ -25,7 +25,7 @@ class TestJumanWrapperPython2(unittest.TestCase):
         try:
             from pyknp import Juman
 
-            juman = Juman()
+            juman = Juman(command='juman', jumanpp=False)
             result = juman.analysis(u"これはペンです。")
             logger.debug(','.join(mrph.midasi for mrph in result))
 
