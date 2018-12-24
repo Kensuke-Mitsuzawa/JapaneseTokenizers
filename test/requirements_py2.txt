@@ -1,0 +1,11 @@
+pypandoc
+future
+six
+jaconv>=0.2
+pip>=8.1.0
+pexpect
+pyknp>=0.4.1
+mecab-python
+typing
+neologdn
+kytea

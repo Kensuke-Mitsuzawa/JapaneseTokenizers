@@ -11,7 +11,7 @@ import unittest
 import os
 import logging
 logger = logging.getLogger(__file__)
-logger.level = logging.DEBUG
+logger.level = logging.INFO
 
 
 class TestJumanppWrapperPython2(unittest.TestCase):

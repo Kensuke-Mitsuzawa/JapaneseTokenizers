@@ -41,10 +41,11 @@ class TestMecabWrapperPython2(unittest.TestCase):
         parsed_obj = mecab_obj.tokenize(sentence=self.test_senetence, return_list=True)
         assert isinstance(parsed_obj, list)
         if python_version >= (3, 0, 0):
-            for morph in parsed_obj: assert isinstance(morph, str)
-            print(parsed_obj)
+            for morph in parsed_obj:
+                assert isinstance(morph, str)
         else:
-            for morph in parsed_obj: assert isinstance(morph, string_types)
+            for morph in parsed_obj:
+                assert isinstance(morph, string_types)
 
 
     def test_init_userdict(self):

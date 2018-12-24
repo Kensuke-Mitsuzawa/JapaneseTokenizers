@@ -1,0 +1,21 @@
+# 開発/test環境としてまとめてdocker環境を整えるためのcompose
+version: '3'
+services:
+  dev_env_py2:
+    build:
+      context: ./
+      dockerfile: Dockerfile-dev
+    volumes:
+    - ..:/codes/
+    stdin_open: true
+    tty: true
+    command: bash -c "source /opt/conda/bin/activate p27 && pip install -r requirements_py2.txt"
+  dev_env_py3:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+    - ..:/codes/
+    stdin_open: true
+    tty: true
+    command: bash -c "source /opt/conda/bin/activate p37 && pip install -r requirements_py3.txt"

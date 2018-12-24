@@ -1,0 +1,12 @@
+# 開発/test環境としてまとめてdocker環境を整えるためのcompose
+version: '3'
+services:
+  test_env:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/codes/
+    stdin_open: true
+    tty: true
+    command: bash -c "juman -S && source /opt/conda/bin/activate p37 && cd /codes/ && python setup.py test && source deactivate && echo 'Python3 test done' && source /opt/conda/bin/activate p27 && cd /codes/ && python setup.py test && echo 'Python2 test done'"

@@ -1,5 +1,5 @@
 #! -*- coding: utf-8 -*-
-from pyknp import Jumanpp
+from pyknp import Juman
 from pyknp import MList
 # modules
 from JapaneseTokenizer.object_models import WrapperBase
@@ -125,7 +125,7 @@ class JumanppWrapper(WrapperBase):
         - server: hostname where jumanpp is running
         - port: port number where jumanpp is running
         """
-        # type: (text_type,int,text_type,text_type,bool)->None
+        # type: (text_type,int,text_type,text_type,bool)
         self.eos_pattern = pattern
         self.is_use_pyknp = is_use_pyknp
 
@@ -153,10 +153,11 @@ class JumanppWrapper(WrapperBase):
         if server is None and self.is_use_pyknp:
             # jumanpp-pexpect #
             logger.debug('jumanpp wrapper is initialized with pyknp package')
-            self.jumanpp_obj = Jumanpp(
+            self.jumanpp_obj = Juman(
                 command=command,
                 timeout=timeout,
                 pattern=pattern,
+                jumanpp=True,
                 **args)
         elif server is None:
             # jumanpp-pexpect #
@@ -187,7 +188,7 @@ class JumanppWrapper(WrapperBase):
         * Output
         - pyknp.MList
         """
-        if isinstance(self.jumanpp_obj, Jumanpp):
+        if isinstance(self.jumanpp_obj, Juman):
             ml_token_object = self.jumanpp_obj.analysis(input_str=input_str)
         elif isinstance(self.jumanpp_obj, JumanppHnadler):
             try:

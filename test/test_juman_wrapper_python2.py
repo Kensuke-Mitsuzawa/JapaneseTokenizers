@@ -14,7 +14,7 @@ import logging
 sys.stdin = codecs.getreader('utf_8')(sys.stdin)
 sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
 logger = logging.getLogger(__file__)
-logger.level = logging.DEBUG
+logger.level = logging.INFO
 
 
 class TestJumanWrapperPython2(unittest.TestCase):
@@ -25,7 +25,7 @@ class TestJumanWrapperPython2(unittest.TestCase):
         try:
             from pyknp import Juman
 
-            juman = Juman()
+            juman = Juman(command='juman', jumanpp=False)
             result = juman.analysis(u"これはペンです。")
             logger.debug(','.join(mrph.midasi for mrph in result))
 

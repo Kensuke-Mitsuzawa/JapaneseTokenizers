@@ -1,7 +1,6 @@
 #! -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 import sys
-import pip
 import logging
 import codecs
 logger = logging.getLogger(__file__)
@@ -14,50 +13,42 @@ try:
     import Mykytea
 except ImportError:
     try:
-        pip.main(['install', 'kytea'])
-    except:
-        logger.error('We failed to install mykytea automatically. Try installing kytea manually.')
-
-    try:
+        import sys
+        import subprocess
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'kytea'])
         import Mykytea
-    except ImportError:
+    except Exception as e:
         logger.error('We failed to install mykytea automatically. Try installing kytea manually.')
+        logger.error(e)
 
-# --------------------------------------------------------------------------------------------------------
-# try to install pyknp automatically because it usually causes to error during installing
-try:
-    import pyknp
-except ImportError:
-    try:
-        pip.main(['install', 'http://nlp.ist.i.kyoto-u.ac.jp/DLcounter/lime.cgi?down=http://lotus.kuee.kyoto-u.ac.jp/nl-resource/pyknp/pyknp-0.3.tar.gz&name=pyknp-0.3.tar.gz'])
-    except:
-        logger.error('We failed to install pyknp automatically. Try installing pyknp manually.')
-
-    try:
-        import pyknp
-    except ImportError:
-        logger.error('We failed to install pyknp automatically. Try installing pyknp manually.')
 # --------------------------------------------------------------------------------------------------------
 try:
     import neologdn
 except ImportError:
     try:
-        pip.main(['install', 'neologdn'])
+        import sys
+        import subprocess
+        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'neologdn'])
         import neologdn
-    except:
+    except Exception as e:
         logger.error('We failed to install neologdn automatically because of some issues in the package. Try installing pyknp manually.')
+        logger.error(e)
+
 # --------------------------------------------------------------------------------------------------------
 
+common_packages = ['pypandoc', 'future', 'six', 'jaconv>=0.2', 'pip>=8.1.0', 'pexpect', 'pyknp>=0.4.1']
 if python_version >= (3, 0, 0):
-    logger.info(msg='python={}'.format(python_version))
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python3', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'pexpect']
+    if python_version <= (3, 5, 0):
+        common_packages.append('typing')
+    elif python_version > (3, 5, 0):
+        common_packages.append('mecab-python3')
 elif python_version <= (2, 9, 9):
-    logger.info(msg='python={}'.format(python_version))
-    install_requires = ['pypandoc', 'future', 'six', 'mecab-python', 'jaconv>=0.2', 'pip>=8.1.0', 'typing', 'pexpect']
+    common_packages.append('typing')
+    common_packages.append('mecab-python')
 else:
     raise NotImplementedError()
 
-version = '1.3.7'
+version = '1.4'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
@@ -84,11 +75,12 @@ setup(
     version=version,
     short_description=short_description,
     long_description=long_description,
-    keywords = ['MeCab', '和布蕪', 'Juman',
+    keywords=['MeCab', '和布蕪', 'Juman',
                 'Japanese morphological analyzer', 'NLP', '形態素解析', '自然言語処理'],
-    license = "MIT",
+    license="MIT",
     url = "https://github.com/Kensuke-Mitsuzawa/JapaneseTokenizers",
     test_suite='test.test_all.suite',
-    install_requires = install_requires,
+    install_requires=common_packages,
+    tests_require=common_packages,
     packages=find_packages()
 )
