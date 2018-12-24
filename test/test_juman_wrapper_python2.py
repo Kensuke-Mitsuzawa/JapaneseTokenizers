@@ -14,7 +14,7 @@ import logging
 sys.stdin = codecs.getreader('utf_8')(sys.stdin)
 sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
 logger = logging.getLogger(__file__)
-logger.level = logging.DEBUG
+logger.level = logging.INFO
 
 
 class TestJumanWrapperPython2(unittest.TestCase):

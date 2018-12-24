@@ -15,8 +15,9 @@ If you find any bugs, please report them to github issues. Or any pull requests 
 
 # Requirements
 
-* Python 2.7
-* Python 3.5
+- Python 2.7
+- Python 3.x
+    - checked in 3.5, 3.6, 3.7  
 
 
 # Features
@@ -50,6 +51,8 @@ Juman++ is succeeding system of Juman. It adopts RNN model for tokenization.
 Juman++ is strong for ambigious writing style in Japanese, and is strong for new-comming words thanks to Web based huge dictionary.
  
 And, Juman tells you semantic meaning of words.
+
+Note: New Juman++ dev-version(later than 2.x) is available at [Github](https://github.com/ku-nlp/jumanpp)
 
 
 ### Kytea
@@ -196,54 +199,30 @@ natto-py is sophisticated package for tokenization. It supports following featur
 
 MIT license
 
+# For developers
 
-# CHANGES
+You could build an environment which has dependencies to test this package.
 
-## 0.6(2016-03-05)
+Simply, you build docker image and run docker container.
 
-* first release to Pypi
+## Dev environment
 
-## 0.7(2016-03-06)
+Develop environment is defined with `test/docker-compose-dev.yml`.
 
-* Juman supports(only for python2.x)
-* Kytea supports(only for python2.x)
+With the docker-compose.yml file, you could call python2.7 or python3.7
 
-## 0.8(2016-04-03)
+If you're using Pycharm Professional edition, you could set docker-compose.yml as remote interpreter.
 
-* removed a bug when interface calls JUMAN
-* fixed the version number of jctconv
- 
-## 0.9 (2016-04-05)
+To call python2.7, set `/opt/conda/envs/p27/bin/python2.7`
 
-* Kytea supports also for Python3.x(Thanks to @chezou)
+To call python3.7, set `/opt/conda/envs/p37/bin/python3.7`
 
-## 1.0 (2016-06-19)
+## Test environment
 
-* Juman supports also for Python3.x
+These commands checks from procedures of package install until test of package.
 
-## 1.2.5 (2016-12-28)
+```bash
+$ docker-compose build
+$ docker-compose up
+```
 
-* It fixed bugs in Juman server mode in python3.x
-* It supports Juman++
-* It supports `filter` method with chain expression
-
-## 1.2.6 (2017-01-12)
-
-* It introduced a paramter on text normalization function
-    * All `\n` strings are converted into `。`. This is because `\n` string in input-text causes tokenization error especially with server-mode. 
-
-
-## 1.2.8 (2017-02-22)
-
-* It has make file for installing tokenizers.
-* It is tested with travis.
-
-## 1.3.0 (2017-02-23)
-
-* It introduced de-normalization function after tokenization process. (全角英数 -> 半角英数)
-* For mecab-config, it detects path to mecab-config automatically
-* It fixed a bug of initializing juman-object in python2
-
-## after 1.3.0
-
-change logs are in github release.

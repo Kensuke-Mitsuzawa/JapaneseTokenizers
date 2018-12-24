@@ -36,6 +36,5 @@ class TestFilter(unittest.TestCase):
             self.assertTrue(bool_any)
 
 
-
 if __name__ == '__main__':
     unittest.main()

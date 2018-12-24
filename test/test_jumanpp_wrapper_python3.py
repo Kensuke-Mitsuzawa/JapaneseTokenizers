@@ -11,7 +11,7 @@ import os
 import logging
 import socket
 logger = logging.getLogger(__file__)
-logger.level = logging.DEBUG
+logger.level = logging.INFO
 
 
 class TestJumanppWrapperPython3(unittest.TestCase):
