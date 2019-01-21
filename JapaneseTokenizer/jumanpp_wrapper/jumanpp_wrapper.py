@@ -112,6 +112,7 @@ class JumanppWrapper(WrapperBase):
                  port=12000,
                  is_use_pyknp = False,
                  ** args):
+        # type: (text_type,int,text_type,text_type,bool)
         """* What you can do
         - You can select backend process of jumanpp.
             - jumanpp-pexpect: It calls jumanpp on your local machine. It keeps jumanpp process running.
@@ -125,7 +126,6 @@ class JumanppWrapper(WrapperBase):
         - server: hostname where jumanpp is running
         - port: port number where jumanpp is running
         """
-        # type: (text_type,int,text_type,text_type,bool)
         self.eos_pattern = pattern
         self.is_use_pyknp = is_use_pyknp
 

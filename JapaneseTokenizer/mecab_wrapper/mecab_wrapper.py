@@ -31,8 +31,6 @@ except:
 
 class MecabWrapper(WrapperBase):
     def __init__(self, dictType, pathUserDictCsv='', path_mecab_config=None, string_encoding='utf-8'):
-        """* What you can do
-        """
         # type: (text_type, text_type, text_type, text_type)->None
         assert dictType in ["neologd", "all", "ipadic", "ipaddic", "user", "", None]
         self.string_encoding = string_encoding
@@ -191,11 +189,11 @@ class MecabWrapper(WrapperBase):
         return tuple_pos, word_stem
 
     def __postprocess_analyzed_result(self, string_mecab_parsed_result, is_feature, is_surface):
+        # type: (text_type,bool,bool)->List[TokenizedResult]
         """Extract surface word and feature from analyzed lines.
         Extracted results are returned with list, whose elements are TokenizedResult class
         [TokenizedResult]
         """
-        # type: (text_type,bool,bool)->List[TokenizedResult]
         assert isinstance(string_mecab_parsed_result, str)
         check_tab_separated_line = lambda x: True if '\t' in x else False
 
@@ -211,10 +209,10 @@ class MecabWrapper(WrapperBase):
         return tokenized_objects
 
     def __result_parser(self, analyzed_line, is_feature, is_surface):
+        # type: (text_type,bool,bool)->TokenizedResult
         """Extract surface word and feature from analyzed line.
         Extracted elements are returned with TokenizedResult class
         """
-        # type: (text_type,bool,bool)->TokenizedResult
         assert isinstance(analyzed_line, str)
         assert isinstance(is_feature, bool)
         assert isinstance(is_surface, bool)
@@ -238,11 +236,11 @@ class MecabWrapper(WrapperBase):
                  is_surface=False,
                  return_list=False,
                  func_normalizer=normalize_text):
+        # type: (text_type, bool, bool, bool, bool, Callable[[str], str])->Union[List[str], TokenizedSenetence]
         """* What you can do
         - Call mecab tokenizer, and return tokenized objects
 
         """
-        # type: (text_type, bool, bool, bool, bool, Callable[[str], str])->Union[List[str], TokenizedSenetence]
         if six.PY2 and isinstance(sentence, str):
             sentence = sentence.decode(self.string_encoding)
         else:

@@ -33,6 +33,7 @@ STRING_EXCEPTION = set([u('*')])
 
 
 def denormalize_text(input_text):
+    # type: (text_type)->text_type
     """* What you can do
     - It converts text into standard japanese writing way
 
@@ -40,7 +41,6 @@ def denormalize_text(input_text):
     - hankaku-katakana is to zenkaku-katakana
     - zenkaku-eisu is to hankaku-eisu
     """
-    # type: (text_type)->text_type
     if input_text in STRING_EXCEPTION:
         return input_text
     else:
@@ -54,13 +54,13 @@ def normalize_text(input_text,
                    is_kana=True,
                    is_ascii=True,
                    is_digit=True):
+    # type: (text_type,text_type,text_type,bool,bool,bool,bool)->text_type
     """* What you can do
     - It converts input-text into normalized-text which is good for tokenizer input.
 
     * Params
     - new_line_replaced: a string which replaces from \n string.
     """
-    # type: (text_type,text_type,text_type,bool,bool,bool,bool)->text_type
     if is_replace_eos:
         without_new_line = input_text.replace('\n', new_line_replaced)
     else:
@@ -75,9 +75,9 @@ def normalize_text(input_text,
 
 
 def normalize_text_normal_ipadic(input_text, kana=True, ascii=True, digit=True):
+    # type: (text_type,bool,bool,bool)->text_type
     """
     * All hankaku Katanaka is converted into Zenkaku Katakana
     * All hankaku English alphabet and numberc string are converted into Zenkaku one
     """
-    # type: (text_type,bool,bool,bool)->text_type
     return jaconv.h2z(input_text, kana=kana, ascii=ascii, digit=digit)

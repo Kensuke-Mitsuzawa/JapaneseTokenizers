@@ -6,7 +6,7 @@ from JapaneseTokenizer.datamodels import FilteredObject, TokenizedResult, Tokeni
 from JapaneseTokenizer import init_logger
 from JapaneseTokenizer.common.sever_handler import JumanppHnadler
 # else
-from typing import List, Union, Any, Callable, Tuple
+from typing import List, Union, Callable, Tuple
 from six import text_type
 from pyknp import MList
 import logging
@@ -25,7 +25,8 @@ except ImportError:
     logger.warning(msg='pyknp is not ready to use. Install first if you would like to use pyknp wrapper.')
 
 if six.PY3:
-    import socket, re
+    import socket
+    import re
 
     class MonkeyPatchSocket(object):
         """* Class for overwriting pyknp.Socket because it is only for python2.x"""
@@ -39,7 +40,7 @@ if six.PY3:
                 self.sock.send(option)
             data = b""
             while b"OK" not in data:
-                #while isinstance(data, bytes) and b"OK" not in data:
+                # while isinstance(data, bytes) and b"OK" not in data:
                 data = self.sock.recv(1024)
 
         def __del__(self):
@@ -47,7 +48,6 @@ if six.PY3:
                 self.sock.close()
 
         def query(self, sentence, pattern):
-            """"""
             # type: (str,str)->str
             assert(isinstance(sentence, six.text_type))
             sentence_bytes = sentence.encode('utf-8').strip()
@@ -74,9 +74,9 @@ class JumanWrapper(WrapperBase):
                  pattern='EOS',
                  is_use_pyknp=False,
                  **args):
+        # type: (text_type, text_type, int, int, text_type, Union[bytes, text_type], Union[bytes, text_type], bool, **str)->None
         """* Class to call Juman tokenizer
         """
-        # type: (text_type,text_type,int,int,text_type,Union[bytes,text_type],Union[bytes,text_type],bool)->None
 
         self.timeout = timeout
         self.pattern = pattern
@@ -101,8 +101,7 @@ class JumanWrapper(WrapperBase):
         else:
             pass
 
-
-        if not server is None:
+        if server is not None:
             # use server mode #
             self.juman = pyknp.Juman(command=command, server=server, port=port,
                                      timeout=self.timeout, rcfile=rcfile, option=option,
@@ -128,10 +127,10 @@ class JumanWrapper(WrapperBase):
                 self.juman.stop_process()
 
     def __monkey_patch_juman_lines(self, input_str):
+        # type: (text_type)->text_type
         """* What you can do
         - It overwrites juman_line() method because this method causes TypeError in python3
         """
-        # type: (text_type,)->text_type
         assert isinstance(self.juman, pyknp.Juman)
         if not self.juman.socket and not self.juman.subprocess:
             if self.juman.server is not None:
