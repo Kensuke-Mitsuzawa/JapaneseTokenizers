@@ -7,7 +7,6 @@ import socket
 # logger
 from JapaneseTokenizer import init_logger
 import logging
-logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 # typing
 from typing import Union
 # else
@@ -17,6 +16,7 @@ import pexpect
 import shutil
 import signal
 import os
+logger = init_logger.init_logger(logging.getLogger(init_logger.LOGGER_NAME))
 
 
 class ProcessDownException(Exception):
@@ -29,8 +29,8 @@ class UnixProcessHandler(object):
                  option=None,
                  pattern='EOS',
                  timeout_second=10):
-        """* Get communication with unix process using pexpect module."""
         # type: (text_type,text_type,text_type,int)->None
+        """* Get communication with unix process using pexpect module."""
         self.command = command
         self.timeout_second = timeout_second
         self.pattern = pattern
@@ -42,10 +42,10 @@ class UnixProcessHandler(object):
             self.process_analyzer.kill(sig=9)
 
     def launch_process(self, command):
+        # type: (Union[bytes,text_type])->None
         """* What you can do
         - It starts process and keep it.
         """
-        # type: (Union[bytes,text_type])->None
         if not self.option is None:
             command_plus_option = self.command + " " + self.option
         else:
@@ -67,7 +67,6 @@ class UnixProcessHandler(object):
                 self.process_id = self.process_analyzer.pid
 
     def restart_process(self):
-        """"""
         # type: ()->None
         if not self.option is None:
             command_plus_option = self.command + " " + self.option
@@ -79,10 +78,10 @@ class UnixProcessHandler(object):
         self.process_id = self.process_analyzer.pid
 
     def stop_process(self):
+        # type: ()->bool
         """* What you can do
         - You're able to stop the process which this instance has now.
         """
-        # type: ()->bool
         if hasattr(self, "process_analyzer"):
             self.process_analyzer.kill(sig=9)
         else:
@@ -91,11 +90,11 @@ class UnixProcessHandler(object):
         return True
 
     def __query(self, input_string):
+        # type: (text_type)->text_type
         """* What you can do
         - It takes the result of Juman++
         - This function monitors time which takes for getting the result.
         """
-        # type: (text_type)->text_type
         signal.signal(signal.SIGALRM, self.__notify_handler)
         signal.alarm(self.timeout_second)
         self.process_analyzer.sendline(input_string)
@@ -118,8 +117,6 @@ class UnixProcessHandler(object):
         2. Run restart_process() method when the exception happens.""".format(**{"time": self.timeout_second}))
 
     def query(self, input_string):
-        """* What you can do
-        """
         # type: (text_type)->text_type
         return self.__query(input_string=input_string)
 
@@ -135,6 +132,5 @@ class JumanppHnadler(UnixProcessHandler):
         super(JumanppHnadler, self).__init__(command=jumanpp_command, option=option, pattern=pattern, timeout_second=timeout_second)
 
     def launch_jumanpp_process(self, command):
-        """"""
         # type: (text_type)->None
         return self.launch_process(command)

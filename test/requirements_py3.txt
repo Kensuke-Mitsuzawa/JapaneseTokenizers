@@ -4,7 +4,7 @@ six
 jaconv>=0.2
 pip>=8.1.0
 pexpect
-pyknp>=0.4.1
+pyknp
 mecab-python3
 neologdn
 kytea

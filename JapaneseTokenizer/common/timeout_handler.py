@@ -1,8 +1,10 @@
 #! -*- coding: utf-8 -*-
 from functools import wraps
 
+
 class TimeoutException(Exception):
     pass
+
 
 def handler_func(msg):
     raise TimeoutException()
