@@ -6,6 +6,8 @@ ENV MECAB_VERSION 0.996
 ENV IPADIC_VERSION 2.7.0-20070801
 ENV mecab_url https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7cENtOXlicTFaRUE
 ENV ipadic_url https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7MWVlSDBCSXZMTXM
+ENV jumandic_url https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7X2pESGlLREpxdXM
+ENV unidic_url https://unidic.ninjal.ac.jp/unidic_archive/cwj/2.3.0/unidic-cwj-2.3.0.zip
 ENV build_deps 'curl git bash file sudo openssh gcc make build-base'
 ENV dependencies 'openssl'
 
@@ -38,10 +40,20 @@ RUN apk add --update --no-cache ${build_deps} \
   # Install Neologd
   && git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git \
   && mecab-ipadic-neologd/bin/install-mecab-ipadic-neologd -n -y \
+  # Install jumandic
+  && curl -SL -o jumandic.tar.gz ${jumandic_url} \
+  && tar zxf jumandic.tar.gz \
+  && cd mecab-jumandic-7.0-20130310 \
+  && ./configure --with-charset=utf8 \
+  && make \
+  && make install \
+  # delete dictionary files
+  && cd \
   && rm -rf \
     mecab-${MECAB_VERSION}* \
     mecab-${IPADIC_VERSION}* \
-    mecab-ipadic-neologd
+    mecab-ipadic-neologd \
+    mecab-jumandic-7.0-20130310
 
 # general
 RUN apk --no-cache add vim \

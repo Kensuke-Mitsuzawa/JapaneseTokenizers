@@ -1,5 +1,5 @@
 #! -*- coding: utf-8 -*-
-# core mddule
+# core module
 from JapaneseTokenizer.object_models import WrapperBase
 from JapaneseTokenizer.common.text_preprocess import normalize_text
 from JapaneseTokenizer import init_logger
@@ -13,7 +13,7 @@ import subprocess
 import six
 from six import text_type
 # typing
-from typing import List, Dict, Tuple, Union, TypeVar, Callable
+from typing import List, Tuple, Union, TypeVar, Callable
 ContentsTypes = TypeVar('T')
 
 __author__ = 'kensuke-mi'
@@ -30,27 +30,54 @@ except:
 
 
 class MecabWrapper(WrapperBase):
-    def __init__(self, dictType, pathUserDictCsv='', path_mecab_config=None, string_encoding='utf-8'):
-        # type: (text_type, text_type, text_type, text_type)->None
-        assert dictType in ["neologd", "all", "ipadic", "ipaddic", "user", "", None]
+    def __init__(self,
+                 dictType,
+                 pathUserDictCsv=None,
+                 path_mecab_config=None,
+                 path_dictionary=None,
+                 string_encoding='utf-8'):
+        # type: (text_type, text_type, text_type, text_type, text_type)->None
+        """
+
+        :param dictType: a dictionary type called by mecab
+        :param pathUserDictCsv: path to your original dictionary file
+        :param path_mecab_config: path to 'mecab_config' command. It's automatically detected if not give
+        :param path_dictionary: path to a dictionary which you want to use. If not given, it's automatically detected
+        :param string_encoding: encoding option to parse command line result. This is mainly used for python2.x
+        """
         self.string_encoding = string_encoding
-        if dictType == 'all' or dictType == 'user': assert os.path.exists(pathUserDictCsv)
+        self._dictType = dictType
+        self._pathUserDictCsv = pathUserDictCsv
+        self._path_dictionary = path_dictionary
         if path_mecab_config is None:
             self._path_mecab_config = self.__get_path_to_mecab_config()
         else:
             self._path_mecab_config = path_mecab_config
 
-        self._dictType = dictType
-        self._pathUserDictCsv = pathUserDictCsv
-        self._mecab_dictionary_path = self.__check_mecab_dict_path()
+        if self._path_dictionary is not None:
+            assert os.path.exists(self._path_dictionary), 'Path dictionary is NOT exist.'
+            self._mecab_dictionary_path = None
+        else:
+            self._mecab_dictionary_path = self.__check_mecab_dict_path()
 
         logger.info("mecab dictionary path is detected under {}".format(self._mecab_dictionary_path))
-
         self.mecabObj = self.__CallMecab()
 
+        assert dictType in ["neologd", "all", "ipadic", "ipaddic", "user", "", "jumandic", "unidic", None], \
+            'Dictionary Type Error. Your dict = {} is NOT available.'
+        if dictType == 'all':
+            logger.error('dictionary type "all" is deprecated from version1.6')
+            raise Exception('dictionary type "all" is deprecated from version1.6')
+        if dictType == 'user':
+            logger.error('dictionary type "user" is deprecated from version1.6. You just give path to dictionary csv.')
+            raise Exception('dictionary type "all" is deprecated from version1.6. You just give path to dictionary csv.')
+
+        if pathUserDictCsv is not None and isinstance(pathUserDictCsv, text_type) and pathUserDictCsv != '':
+            assert os.path.exists(pathUserDictCsv), \
+                'Your user dictionary does NOT exist. Path={}'.format(pathUserDictCsv)
+
     def __get_path_to_mecab_config(self):
-        """* What you can do
-        - You get path into mecab-config
+        """You get path into mecab-config
         """
         if six.PY2:
             path_mecab_config_dir = subprocess.check_output(['which', 'mecab-config'])
@@ -61,7 +88,6 @@ class MecabWrapper(WrapperBase):
 
         logger.info(msg='mecab-config is detected at {}'.format(path_mecab_config_dir))
         return path_mecab_config_dir
-
 
     def __check_mecab_dict_path(self):
         """check path to dict of Mecab in system environment
@@ -78,16 +104,13 @@ class MecabWrapper(WrapperBase):
             logger.error("{}".format(mecab_dic_cmd))
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to execute mecab-config command")
         if path_mecab_dict == '':
-            raise SystemError(
-                'mecab dictionary path is not found with following command: {} You are not able to use additional dictionary. Still you are able to call mecab default dictionary'.format(mecab_dic_cmd)
-            )
+            raise SystemError("""mecab dictionary path is not found with following command: {} 
+            You are not able to use additional dictionary. 
+            Still you are able to call mecab default dictionary""".format(mecab_dic_cmd))
 
         return path_mecab_dict
 
     def __check_mecab_libexe(self):
-        """* What you can do
-        """
-
         mecab_libexe_cmd = "echo `{} --libexecdir`".format(os.path.join(self._path_mecab_config, 'mecab-config'))
 
         try:
@@ -100,34 +123,39 @@ class MecabWrapper(WrapperBase):
             logger.error("{}".format(mecab_libexe_cmd))
             raise subprocess.CalledProcessError(returncode=-1, cmd="Failed to execute mecab-config --libexecdir")
         if path_mecab_libexe == '':
-            raise SystemError('Mecab config is not callable with following command: {} You are not able to compile your user dictionary. Still, you are able to use default mecab dictionary.'.format(mecab_libexe_cmd))
+            raise SystemError("""Mecab config is not callable with following command: {} 
+            You are not able to compile your user dictionary. 
+            Still, you are able to use default mecab dictionary.""".format(mecab_libexe_cmd))
 
         return path_mecab_libexe
 
     def __CallMecab(self):
-        """* What you can do
-        """
-        if self._dictType == 'neologd':
+        if self._path_dictionary is not None and self._mecab_dictionary_path is None:
+            logger.debug('Use dictionary you specified.')
+            cmMecabInitialize = '-d {}'.format(self._path_dictionary)
+        elif self._dictType == 'neologd':
+            # use neologd
             logger.debug('Use neologd additional dictionary')
             cmMecabInitialize = '-d {}'.format(os.path.join(self._mecab_dictionary_path, "mecab-ipadic-neologd"))
-
-        elif self._dictType == 'all':
-            logger.debug('Use neologd additional dictionary')
-            pathUserDict = self.__CompileUserdict()
-            cmMecabInitialize = '-u {} -d {}'.format(pathUserDict,
-                                                     os.path.join(self._mecab_dictionary_path, "mecab-ipadic-neologd"))
-        elif self._dictType == 'ipadic':
-            logger.debug('Use ipadic additional dictionary')
+        elif self._dictType == 'ipadic' or self._dictType == 'ipaddic':
+            # use ipadic
+            logger.debug('Use ipadic dictionary')
             cmMecabInitialize = '-d {}'.format(os.path.join(self._mecab_dictionary_path, "ipadic"))
-
-        elif self._dictType == 'user':
-            logger.debug('Use User dictionary')
-            pathUserDict = self.__CompileUserdict()
-            cmMecabInitialize = '-u {}'.format(pathUserDict)
-
+        elif six.PY2 is False and self._dictType == 'jumandic':
+            # use jumandic. This is impossible to call in Python2.x
+            logger.debug('Use jumandic dictionary')
+            cmMecabInitialize = '-d {}'.format(os.path.join(self._mecab_dictionary_path, "jumandic"))
+        elif six.PY2 and self._dictType == 'jumandic':
+            raise Exception('In python2.x, impossible to call jumandic.')
         else:
             logger.debug('Use no default dictionary')
             cmMecabInitialize = ''
+
+        # execute compile if user dictionary is given
+        if self._pathUserDictCsv is not None:
+            logger.debug('Use User dictionary')
+            pathUserDict = self.__CompileUserdict()
+            cmMecabInitialize += ' -u {}'.format(pathUserDict)
 
         if six.PY2:
             cmMecabCall = "-Ochasen {}".format(cmMecabInitialize)
@@ -246,7 +274,7 @@ class MecabWrapper(WrapperBase):
         else:
             pass
 
-        ### decide normalization function depending on dictType
+        # decide normalization function depending on dictType
         if func_normalizer is None and self._dictType == 'neologd' and is_neologdn_valid:
             normalized_sentence = neologdn.normalize(sentence)
         elif func_normalizer is None and self._dictType == 'neologd' and is_neologdn_valid == False:

@@ -47,17 +47,31 @@ class TestMecabWrapperPython2(unittest.TestCase):
             for morph in parsed_obj:
                 assert isinstance(morph, string_types)
 
-
     def test_init_userdict(self):
+        # test when user dictionary is called
+        mecab_obj = MecabWrapper(dictType='ipadic', pathUserDictCsv=self.path_user_dict)
+        assert isinstance(mecab_obj, MecabWrapper)
+        parsed_obj = mecab_obj.tokenize(sentence=self.test_senetence, return_list=True)
+        is_ok = False
+        for morph in parsed_obj:
+            if u'さくらまな' == morph:
+                is_ok = True
+        else:
+            pass
+        assert is_ok
+
+    def test_parse_jumandic(self):
+        with self.assertRaises(Exception):
+            mecab_obj = MecabWrapper(dictType='jumandic')
+            assert isinstance(mecab_obj, MecabWrapper)
+
+    def test_init_alldict(self):
         """* Test case
         - すべての辞書を利用した場合の動作を確認する
         """
-        mecab_obj = MecabWrapper(dictType='all', pathUserDictCsv=self.path_user_dict)
-        assert isinstance(mecab_obj, MecabWrapper)
-
-        res = mecab_obj.tokenize(sentence=self.test_senetence, return_list=True)
-        assert isinstance(res, list)
-        assert u'さくらまな' in res
+        with self.assertRaises(Exception):
+            mecab_obj = MecabWrapper(dictType='all', pathUserDictCsv=self.path_user_dict)
+            assert isinstance(mecab_obj, MecabWrapper)
 
 
 if __name__ == '__main__':

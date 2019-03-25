@@ -11,3 +11,5 @@ Mykytea-python/
 .DS_Store
 *tox
 .cache/
+python/
+python2/
