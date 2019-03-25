@@ -23,5 +23,13 @@ make
 sudo make install
 sudo ldconfig
 
+wget -O jumandic.tar.gz 'https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7X2pESGlLREpxdXM'
+tar zxfv jumandic.tar.gz
+cd mecab-jumandic-7.0-20130310
+./configure --with-charset=utf8
+make
+sudo make install
+sudo ldconfig
+
 cd $base_dir
-rm -rf mecab-0.996 mecab-ipadic-2.7.0-20070801
+rm -rf mecab-0.996 mecab-ipadic-2.7.0-20070801 mecab-jumandic-7.0-20130310
