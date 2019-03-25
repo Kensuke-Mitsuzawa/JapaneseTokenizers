@@ -48,7 +48,7 @@ elif python_version <= (2, 9, 9):
 else:
     raise NotImplementedError()
 
-version = '1.5'
+version = '1.6'
 name = 'JapaneseTokenizer'
 short_description = '`JapaneseTokenizer` is a package for easy Japanese Tokenization'
 
